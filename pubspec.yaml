@@ -43,6 +43,18 @@ dependencies:
   
   # Password hashing
   crypto: ^3.0.3
+  
+  # Image picker for profile photo
+  image_picker: ^1.0.7
+  
+  # Image cropper for profile photo cropping
+  image_cropper: ^8.0.2
+  
+  # Session management
+  shared_preferences: ^2.2.2
+  
+  # Date formatting
+  intl: ^0.19.0
 
 dev_dependencies:
   flutter_test:
@@ -67,9 +79,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+  assets:
+    - assets/logo.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

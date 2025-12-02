@@ -1,7 +1,4 @@
-import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:path/path.dart';
 import '../models/user.dart';
 
@@ -9,20 +6,7 @@ class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
   static Database? _database;
 
-  DatabaseHelper._init() {
-    // Initialize sqflite for desktop platforms (not web)
-    if (!kIsWeb) {
-      try {
-        if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-          sqfliteFfiInit();
-          databaseFactory = databaseFactoryFfi;
-        }
-      } catch (e) {
-        // Platform not supported, use default factory
-        debugPrint('Platform detection failed: $e');
-      }
-    }
-  }
+  DatabaseHelper._init();
 
   Future<Database> get database async {
     if (_database != null) return _database!;
@@ -36,8 +20,9 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _createDB,
+      onUpgrade: _onUpgrade,
     );
   }
 
@@ -46,10 +31,26 @@ class DatabaseHelper {
       CREATE TABLE users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         firstName TEXT NOT NULL,
+        lastName TEXT,
         email TEXT NOT NULL UNIQUE,
-        passwordHash TEXT NOT NULL
+        passwordHash TEXT NOT NULL,
+        phone TEXT,
+        profilePhoto TEXT,
+        gender TEXT,
+        dateOfBirth TEXT
       )
     ''');
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      // Add new columns for existing users
+      await db.execute('ALTER TABLE users ADD COLUMN lastName TEXT');
+      await db.execute('ALTER TABLE users ADD COLUMN phone TEXT');
+      await db.execute('ALTER TABLE users ADD COLUMN profilePhoto TEXT');
+      await db.execute('ALTER TABLE users ADD COLUMN gender TEXT');
+      await db.execute('ALTER TABLE users ADD COLUMN dateOfBirth TEXT');
+    }
   }
 
   // Create new user
@@ -82,6 +83,17 @@ class DatabaseHelper {
       return User.fromMap(result.first);
     }
     return null;
+  }
+
+  // Update user profile
+  Future<int> updateUser(User user) async {
+    final db = await database;
+    return await db.update(
+      'users',
+      user.toMap(),
+      where: 'id = ?',
+      whereArgs: [user.id],
+    );
   }
 
   // Close database
