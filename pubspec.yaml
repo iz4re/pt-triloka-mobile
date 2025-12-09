@@ -47,6 +47,9 @@ dependencies:
   # Image picker for profile photo  
   image_picker: ^1.0.7
 
+  # File picker for document upload (v2 embedding)
+  file_picker: ^8.0.0
+
   # Image cropper for profile photo cropping
   image_cropper: ^8.0.2
 

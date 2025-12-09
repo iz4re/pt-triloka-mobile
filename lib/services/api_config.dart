@@ -45,6 +45,14 @@ class ApiConfig {
   static String markAsRead(int id) => '/notifications/$id/read';
   static const String markAllAsRead = '/notifications/read-all';
 
+  // Project Requests
+  static const String projectRequests = '/project-requests';
+  static String projectRequestDetail(int id) => '/project-requests/$id';
+  static String uploadDocument(int requestId) =>
+      '/project-requests/$requestId/documents';
+  static String deleteDocument(int documentId) =>
+      '/request-documents/$documentId';
+
   // Timeout settings
   static const Duration connectTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);

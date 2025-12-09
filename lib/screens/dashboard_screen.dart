@@ -8,6 +8,7 @@ import 'profile_screen.dart';
 import 'notification_screen.dart';
 import 'invoice_list_screen.dart';
 import 'payment_history_screen.dart';
+import 'project_request_list_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -482,6 +483,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   },
                 ),
               ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _buildQuickActionButton(
+                  icon: Icons.business_center,
+                  label: 'Ajukan\nProject',
+                  color: const Color(0xFF9C27B0),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ProjectRequestListScreen(),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const Expanded(child: SizedBox()),
             ],
           ),
         ],

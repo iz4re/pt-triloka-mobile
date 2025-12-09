@@ -8,6 +8,7 @@ use App\Http\Controllers\API\PaymentController;
 use App\Http\Controllers\API\ItemController;
 use App\Http\Controllers\API\DashboardController;
 use App\Http\Controllers\API\NotificationController;
+use App\Http\Controllers\API\ProjectRequestController;
 
 // Public routes
 Route::post('/register', [AuthController::class, 'register']);
@@ -53,4 +54,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
     Route::put('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
+    
+    // Project Requests
+    Route::get('/project-requests', [ProjectRequestController::class, 'index']);
+    Route::post('/project-requests', [ProjectRequestController::class, 'store']);
+    Route::get('/project-requests/{id}', [ProjectRequestController::class, 'show']);
+    Route::put('/project-requests/{id}', [ProjectRequestController::class, 'update']);
+    Route::delete('/project-requests/{id}', [ProjectRequestController::class, 'destroy']);
+    
+    // Request Documents
+    Route::post('/project-requests/{id}/documents', [ProjectRequestController::class, 'uploadDocument']);
+    Route::delete('/request-documents/{id}', [ProjectRequestController::class, 'deleteDocument']);
 });

@@ -309,4 +309,145 @@ class ApiService {
       rethrow;
     }
   }
+
+  // Project Requests
+  Future<Map<String, dynamic>> getProjectRequests({String? status}) async {
+    try {
+      final response = await _dio.get(
+        ApiConfig.projectRequests,
+        queryParameters: status != null ? {'status': status} : null,
+      );
+      return response.data;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        return e.response!.data;
+      }
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> getProjectRequestDetail(int id) async {
+    try {
+      final response = await _dio.get(ApiConfig.projectRequestDetail(id));
+      return response.data;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        return e.response!.data;
+      }
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> createProjectRequest({
+    required String title,
+    required String type,
+    required String description,
+    required String location,
+    double? expectedBudget,
+    String? expectedTimeline,
+  }) async {
+    try {
+      final response = await _dio.post(
+        ApiConfig.projectRequests,
+        data: {
+          'title': title,
+          'type': type,
+          'description': description,
+          'location': location,
+          'expected_budget': expectedBudget,
+          'expected_timeline': expectedTimeline,
+        },
+      );
+      return response.data;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        return e.response!.data;
+      }
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> updateProjectRequest(
+    int id, {
+    String? title,
+    String? type,
+    String? description,
+    String? location,
+    double? expectedBudget,
+    String? expectedTimeline,
+  }) async {
+    try {
+      final Map<String, dynamic> data = {};
+
+      if (title != null) data['title'] = title;
+      if (type != null) data['type'] = type;
+      if (description != null) data['description'] = description;
+      if (location != null) data['location'] = location;
+      if (expectedBudget != null) data['expected_budget'] = expectedBudget;
+      if (expectedTimeline != null)
+        data['expected_timeline'] = expectedTimeline;
+
+      final response = await _dio.put(
+        ApiConfig.projectRequestDetail(id),
+        data: data,
+      );
+      return response.data;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        return e.response!.data;
+      }
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> deleteProjectRequest(int id) async {
+    try {
+      final response = await _dio.delete(ApiConfig.projectRequestDetail(id));
+      return response.data;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        return e.response!.data;
+      }
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> uploadRequestDocument(
+    int requestId,
+    List<int> fileBytes,
+    String fileName, {
+    required String documentType,
+    String? description,
+  }) async {
+    try {
+      FormData formData = FormData.fromMap({
+        'file': MultipartFile.fromBytes(fileBytes, filename: fileName),
+        'document_type': documentType,
+        if (description != null) 'description': description,
+      });
+
+      final response = await _dio.post(
+        ApiConfig.uploadDocument(requestId),
+        data: formData,
+      );
+      return response.data;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        return e.response!.data;
+      }
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> deleteRequestDocument(int documentId) async {
+    try {
+      final response = await _dio.delete(ApiConfig.deleteDocument(documentId));
+      return response.data;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        return e.response!.data;
+      }
+      rethrow;
+    }
+  }
 }
