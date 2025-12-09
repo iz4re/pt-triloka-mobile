@@ -185,9 +185,23 @@ class ApiService {
   }
 
   // Invoice APIs
-  Future<Map<String, dynamic>> getInvoices() async {
+  Future<Map<String, dynamic>> getInvoices({
+    String? status,
+    String? search,
+  }) async {
     try {
-      final response = await _dio.get(ApiConfig.invoices);
+      Map<String, dynamic> queryParams = {};
+      if (status != null && status.isNotEmpty) {
+        queryParams['status'] = status;
+      }
+      if (search != null && search.isNotEmpty) {
+        queryParams['search'] = search;
+      }
+
+      final response = await _dio.get(
+        ApiConfig.invoices,
+        queryParameters: queryParams.isNotEmpty ? queryParams : null,
+      );
       return response.data;
     } on DioException catch (e) {
       if (e.response != null) {
@@ -237,6 +251,56 @@ class ApiService {
   Future<Map<String, dynamic>> markAllNotificationsAsRead() async {
     try {
       final response = await _dio.put(ApiConfig.markAllAsRead);
+      return response.data;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        return e.response!.data;
+      }
+      rethrow;
+    }
+  }
+
+  // Overdue invoices
+  Future<Map<String, dynamic>> getOverdueInvoices() async {
+    try {
+      final response = await _dio.get('/invoices/overdue');
+      return response.data;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        return e.response!.data;
+      }
+      rethrow;
+    }
+  }
+
+  // Payment APIs
+  Future<Map<String, dynamic>> getPayments() async {
+    try {
+      final response = await _dio.get(ApiConfig.payments);
+      return response.data;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        return e.response!.data;
+      }
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> getPaymentDetail(int id) async {
+    try {
+      final response = await _dio.get(ApiConfig.paymentDetail(id));
+      return response.data;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        return e.response!.data;
+      }
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> getInvoicePayments(int invoiceId) async {
+    try {
+      final response = await _dio.get(ApiConfig.invoicePayments(invoiceId));
       return response.data;
     } on DioException catch (e) {
       if (e.response != null) {

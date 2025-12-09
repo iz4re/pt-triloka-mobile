@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import '../models/user.dart';
 import '../services/user_session.dart';
 import '../services/api_service.dart';
-import 'login_screen.dart';
 import 'profile_screen.dart';
 import 'notification_screen.dart';
+import 'invoice_list_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -66,6 +66,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
     setState(() {
       _selectedIndex = index;
     });
+
+    // Navigate to invoice list when invoice tab is tapped
+    if (index == 1) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const InvoiceListScreen()),
+      ).then((_) {
+        setState(() {
+          _selectedIndex = 0;
+        });
+      });
+    }
 
     // Navigate to notification screen when notification tab is tapped
     if (index == 3) {
