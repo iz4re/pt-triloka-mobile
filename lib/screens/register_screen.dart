@@ -33,9 +33,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() => _isLoading = true);
 
     final result = await _authService.register(
-      _firstNameController.text.trim(),
-      _emailController.text.trim(),
-      _passwordController.text,
+      name: _firstNameController.text.trim(),
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+      passwordConfirmation: _passwordController.text,
     );
 
     setState(() => _isLoading = false);
@@ -43,16 +44,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (!mounted) return;
 
     if (result.success) {
+      // Go back to login screen
+      Navigator.of(context).pop();
+      
       // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result.message),
+        const SnackBar(
+          content: Text('Registration successful! Please login.'),
           backgroundColor: Colors.green,
+          duration: Duration(seconds: 3),
         ),
-      );
-      // Navigate to login or dashboard
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const DashboardScreen()),
       );
     } else {
       // Show error message

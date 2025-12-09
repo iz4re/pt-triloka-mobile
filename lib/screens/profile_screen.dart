@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import '../models/user.dart';
 import '../services/user_session.dart';
+import '../services/api_service.dart';
 import 'edit_profile_screen.dart';
 import 'login_screen.dart';
 
@@ -15,19 +16,49 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   User? user;
+  bool _isLoading = false;
+  final ApiService _apiService = ApiService();
 
   @override
   void initState() {
     super.initState();
     user = UserSession().currentUser;
+    _loadUserProfile();
+  }
+
+  Future<void> _loadUserProfile() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final response = await _apiService.getUser();
+
+      if (response['success'] == true) {
+        final userData = response['data'];
+        setState(() {
+          user = User(
+            id: userData['id'],
+            firstName: userData['name']?.split(' ').first ?? 'User',
+            lastName: userData['name']?.split(' ').skip(1).join(' '),
+            email: userData['email'],
+            passwordHash: '',
+            phone: userData['phone'],
+            gender: userData['gender'],
+            dateOfBirth: userData['date_of_birth'],
+          );
+        });
+      }
+    } catch (e) {
+      // Fallback to local session data if API fails
+      print('Error loading profile: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text('No user logged in')),
-      );
+      return const Scaffold(body: Center(child: Text('No user logged in')));
     }
 
     return Scaffold(
@@ -48,18 +79,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-            _buildProfileHeader(),
-            const SizedBox(height: 20),
-            _buildMenuSection(),
-            const SizedBox(height: 20),
-            _buildMoreSection(),
-            const SizedBox(height: 20),
-          ],
-        ),
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                _buildProfileHeader(),
+                const SizedBox(height: 20),
+                _buildMenuSection(),
+                const SizedBox(height: 20),
+                _buildMoreSection(),
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
+          if (_isLoading)
+            Container(
+              color: Colors.black.withOpacity(0.3),
+              child: const Center(child: CircularProgressIndicator()),
+            ),
+        ],
       ),
     );
   }
@@ -95,10 +135,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 4),
                 Text(
                   user!.email,
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 14,
-                  ),
+                  style: const TextStyle(color: Colors.white70, fontSize: 14),
                 ),
               ],
             ),
@@ -190,9 +227,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             title: 'Saved Beneficiary',
             subtitle: 'Manage your saved account',
             onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Coming soon')),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('Coming soon')));
             },
           ),
           const Divider(height: 1),
@@ -238,9 +275,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 title: 'Help & Support',
                 subtitle: '',
                 onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Coming soon')),
-                  );
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(const SnackBar(content: Text('Coming soon')));
                 },
               ),
               const Divider(height: 1),
@@ -299,10 +336,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(height: 4),
                     Text(
                       subtitle,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
+                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                     ),
                   ],
                 ],
@@ -331,9 +365,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               await UserSession().clearUser();
               if (mounted) {
                 Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(
-                    builder: (context) => const LoginScreen(),
-                  ),
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
                   (route) => false,
                 );
               }

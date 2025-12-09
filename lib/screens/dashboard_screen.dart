@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import '../models/user.dart';
 import '../services/user_session.dart';
+import '../services/api_service.dart';
 import 'login_screen.dart';
 import 'profile_screen.dart';
 
@@ -16,11 +17,47 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 0;
   User? user;
+  
+  // Dashboard data state
+  bool _isLoading = true;
+  Map<String, dynamic>? _dashboardData;
+  String? _errorMessage;
+  
+  final ApiService _apiService = ApiService();
 
   @override
   void initState() {
     super.initState();
     user = UserSession().currentUser;
+    _loadDashboardData();
+  }
+  
+  Future<void> _loadDashboardData() async {
+    try {
+      setState(() {
+        _isLoading = true;
+        _errorMessage = null;
+      });
+      
+      final response = await _apiService.getDashboardSummary();
+      
+      if (response['success'] == true) {
+        setState(() {
+          _dashboardData = response['data'];
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _errorMessage = response['message'] ?? 'Failed to load dashboard data';
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Error loading dashboard: ${e.toString()}';
+        _isLoading = false;
+      });
+    }
   }
 
   void _onNavigationTap(int index) {
@@ -46,6 +83,43 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildDashboardContent() {
+    // Show loading indicator
+    if (_isLoading) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(40.0),
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+    
+    // Show error message
+    if (_errorMessage != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, size: 60, color: Colors.red),
+              const SizedBox(height: 16),
+              Text(
+                _errorMessage!,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _loadDashboardData,
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+    
+    // Show dashboard content
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -261,6 +335,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildStatisticsCards() {
+    // Get data from API response
+    final invoices = _dashboardData?['invoices'] ?? {};
+    final totalInvoices = invoices['total'] ?? 0;
+    final unpaidInvoices = invoices['unpaid'] ?? 0;
+    
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
@@ -269,7 +348,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             child: _buildStatCard(
               icon: Icons.description,
               iconColor: const Color(0xFF2196F3),
-              value: '45',
+              value: '$totalInvoices',
               label: 'Total Invoice',
             ),
           ),
@@ -278,7 +357,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             child: _buildStatCard(
               icon: Icons.access_time,
               iconColor: const Color(0xFFFFA726),
-              value: '12',
+              value: '$unpaidInvoices',
               label: 'Pending',
             ),
           ),

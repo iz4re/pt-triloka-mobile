@@ -6,7 +6,7 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:intl/intl.dart';
 import '../models/user.dart';
 import '../services/user_session.dart';
-import '../database/database_helper.dart';
+import '../services/api_service.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -21,7 +21,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _lastNameController;
   late TextEditingController _phoneController;
   late TextEditingController _dobController;
-  
+
   String? _gender;
   String? _profilePhotoBase64;
   DateTime? _selectedDate;
@@ -33,14 +33,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void initState() {
     super.initState();
     user = UserSession().currentUser;
-    
+
     _firstNameController = TextEditingController(text: user?.firstName ?? '');
     _lastNameController = TextEditingController(text: user?.lastName ?? '');
     _phoneController = TextEditingController(text: user?.phone ?? '');
     _dobController = TextEditingController(text: user?.dateOfBirth ?? '');
     _gender = user?.gender;
     _profilePhotoBase64 = user?.profilePhoto;
-    
+
     // Parse existing date if available
     if (user?.dateOfBirth != null && user!.dateOfBirth!.isNotEmpty) {
       try {
@@ -63,16 +63,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Future<void> _pickImage() async {
     try {
       final ImagePicker picker = ImagePicker();
-      final XFile? image = await picker.pickImage(
-        source: ImageSource.gallery,
-      );
+      final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
       if (image == null) return;
 
       // Check file size (max 50MB)
       final fileSize = await image.length();
       const maxSize = 50 * 1024 * 1024; // 50MB in bytes
-      
+
       if (fileSize > maxSize) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -111,7 +109,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       if (croppedFile != null) {
         // Read cropped image bytes
         final bytes = await croppedFile.readAsBytes();
-        
+
         // Encode to base64
         setState(() {
           _profilePhotoBase64 = base64Encode(bytes);
@@ -129,9 +127,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to pick image: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to pick image: $e')));
       }
     }
   }
@@ -162,36 +160,60 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     });
 
     try {
-      // Update user object
-      final updatedUser = user!.copyWith(
-        firstName: _firstNameController.text.trim(),
-        lastName: _lastNameController.text.trim().isEmpty 
-            ? null 
-            : _lastNameController.text.trim(),
-        phone: _phoneController.text.trim().isEmpty 
-            ? null 
+      final ApiService apiService = ApiService();
+
+      // Prepare full name
+      String fullName = _firstNameController.text.trim();
+      if (_lastNameController.text.trim().isNotEmpty) {
+        fullName += ' ${_lastNameController.text.trim()}';
+      }
+
+      // Call API to update profile
+      final response = await apiService.updateProfile(
+        name: fullName,
+        phone: _phoneController.text.trim().isEmpty
+            ? null
             : _phoneController.text.trim(),
-        gender: _gender,
-        dateOfBirth: _dobController.text.trim().isEmpty 
-            ? null 
-            : _dobController.text.trim(),
-        profilePhoto: _profilePhotoBase64,
       );
 
-      // Save to database
-      await DatabaseHelper.instance.updateUser(updatedUser);
-
-      // Update session
-      await UserSession().updateUser(updatedUser);
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Profile updated successfully!'),
-            backgroundColor: Colors.green,
-          ),
+      if (response['success'] == true) {
+        // Update local user object
+        final userData = response['data'];
+        final updatedUser = User(
+          id: userData['id'],
+          firstName: userData['name']?.split(' ').first ?? 'User',
+          lastName: userData['name']?.split(' ').skip(1).join(' '),
+          email: userData['email'],
+          passwordHash: '',
+          phone: userData['phone'],
+          gender: _gender,
+          dateOfBirth: _dobController.text.trim().isEmpty
+              ? null
+              : _dobController.text.trim(),
+          profilePhoto: _profilePhotoBase64,
         );
-        Navigator.pop(context, true); // Return true to indicate update
+
+        // Update session
+        await UserSession().updateUser(updatedUser);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Profile updated successfully!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          Navigator.pop(context, true); // Return true to indicate update
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(response['message'] ?? 'Failed to update profile'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -304,10 +326,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (_profilePhotoBase64 != null && _profilePhotoBase64!.isNotEmpty) {
       try {
         Uint8List bytes = base64Decode(_profilePhotoBase64!);
-        return CircleAvatar(
-          radius: 50,
-          backgroundImage: MemoryImage(bytes),
-        );
+        return CircleAvatar(radius: 50, backgroundImage: MemoryImage(bytes));
       } catch (e) {
         return _buildDefaultAvatar();
       }
@@ -405,10 +424,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           border: InputBorder.none,
         ),
         items: ['Male', 'Female', 'Other'].map((String value) {
-          return DropdownMenuItem<String>(
-            value: value,
-            child: Text(value),
-          );
+          return DropdownMenuItem<String>(value: value, child: Text(value));
         }).toList(),
         onChanged: (value) {
           setState(() {
@@ -433,7 +449,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             decoration: InputDecoration(
               labelText: 'What is your date of birth?',
               labelStyle: TextStyle(color: Colors.grey[600]),
-              suffixIcon: const Icon(Icons.calendar_today, color: Color(0xFF00BCD4)),
+              suffixIcon: const Icon(
+                Icons.calendar_today,
+                color: Color(0xFF00BCD4),
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
@@ -473,10 +492,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               )
             : const Text(
                 'Update Profile',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
       ),
     );

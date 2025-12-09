@@ -34,27 +34,33 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-  
+
   # Database
   sqflite: ^2.3.0
   sqflite_common_ffi: ^2.3.0
   path_provider: ^2.1.1
   path: ^1.8.3
-  
+
   # Password hashing
   crypto: ^3.0.3
-  
-  # Image picker for profile photo
+
+  # Image picker for profile photo  
   image_picker: ^1.0.7
-  
+
   # Image cropper for profile photo cropping
   image_cropper: ^8.0.2
-  
+
   # Session management
   shared_preferences: ^2.2.2
-  
+
   # Date formatting
   intl: ^0.19.0
+
+  # HTTP client for API calls
+  dio: ^5.4.0
+
+  # Secure token storage
+  flutter_secure_storage: ^9.0.0
 
 dev_dependencies:
   flutter_test:

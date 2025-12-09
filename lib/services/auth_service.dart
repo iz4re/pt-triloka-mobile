@@ -1,67 +1,42 @@
-import 'dart:convert';
-import 'package:crypto/crypto.dart';
-import '../database/database_helper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'api_service.dart';
 import '../models/user.dart';
+import 'dart:convert';
 
 class AuthService {
-  final DatabaseHelper _dbHelper = DatabaseHelper.instance;
+  final ApiService _apiService = ApiService();
 
-  // Hash password using SHA256
-  String _hashPassword(String password) {
-    final bytes = utf8.encode(password);
-    final digest = sha256.convert(bytes);
-    return digest.toString();
-  }
-
-  // Register new user
-  Future<AuthResult> register(String firstName, String email, String password) async {
-    try {
-      // Check if email already exists
-      final exists = await _dbHelper.emailExists(email);
-      if (exists) {
-        return AuthResult(
-          success: false,
-          message: 'Email already registered. Please use a different email.',
-        );
-      }
-
-      // Create new user
-      final user = User(
-        firstName: firstName,
-        email: email,
-        passwordHash: _hashPassword(password),
-      );
-
-      await _dbHelper.createUser(user);
-
-      return AuthResult(
-        success: true,
-        message: 'Registration successful!',
-      );
-    } catch (e) {
-      return AuthResult(
-        success: false,
-        message: 'Registration failed: ${e.toString()}',
-      );
-    }
-  }
-
-  // Login user
+  // Login user via API
   Future<AuthResult> login(String email, String password) async {
     try {
-      final passwordHash = _hashPassword(password);
-      final user = await _dbHelper.getUserByCredentials(email, passwordHash);
+      final response = await _apiService.login(email, password);
 
-      if (user != null) {
+      if (response['success'] == true) {
+        // Parse user data from API response
+        final userData = response['data']['user'];
+        final user = User(
+          id: userData['id'],
+          firstName: userData['name']?.split(' ').first ?? 'User',
+          lastName: userData['name']?.split(' ').skip(1).join(' '),
+          email: userData['email'],
+          passwordHash: '', // Not needed from API
+          phone: userData['phone'],
+          gender: userData['gender'],
+          dateOfBirth: userData['date_of_birth'],
+        );
+
+        // Save user data to SharedPreferences for session
+        await _saveUserToLocalStorage(user);
+
         return AuthResult(
           success: true,
-          message: 'Login successful!',
+          message: response['message'] ?? 'Login successful!',
           user: user,
         );
       } else {
         return AuthResult(
           success: false,
-          message: 'Invalid email or password. Please try again.',
+          message: response['message'] ?? 'Login failed',
         );
       }
     } catch (e) {
@@ -70,6 +45,81 @@ class AuthService {
         message: 'Login failed: ${e.toString()}',
       );
     }
+  }
+
+  // Register new user via API
+  Future<AuthResult> register({
+    required String name,
+    required String email,
+    required String password,
+    required String passwordConfirmation,
+    String? phone,
+    String? address,
+    String? companyName,
+  }) async {
+    try {
+      final response = await _apiService.register(
+        name: name,
+        email: email,
+        password: password,
+        passwordConfirmation: passwordConfirmation,
+        phone: phone,
+        address: address,
+        companyName: companyName,
+      );
+
+      if (response['success'] == true) {
+        // Don't save user to local storage - they need to login manually
+        // Just return success message
+        return AuthResult(
+          success: true,
+          message: response['message'] ?? 'Registration successful!',
+        );
+      } else {
+        return AuthResult(
+          success: false,
+          message: response['message'] ?? 'Registration failed',
+        );
+      }
+    } catch (e) {
+      return AuthResult(
+        success: false,
+        message: 'Registration failed: ${e.toString()}',
+      );
+    }
+  }
+
+  // Logout user
+  Future<void> logout() async {
+    await _apiService.logout();
+    await _clearLocalStorage();
+  }
+
+  // Save user to local storage for session management
+  Future<void> _saveUserToLocalStorage(User user) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user_data', json.encode(user.toMap()));
+  }
+
+  // Clear local storage
+  Future<void> _clearLocalStorage() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('user_data');
+  }
+
+  // Get current user from local storage
+  Future<User?> getCurrentUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userData = prefs.getString('user_data');
+    if (userData != null) {
+      return User.fromMap(json.decode(userData));
+    }
+    return null;
+  }
+
+  // Check if user is logged in
+  Future<bool> isLoggedIn() async {
+    return await _apiService.isLoggedIn();
   }
 }
 
