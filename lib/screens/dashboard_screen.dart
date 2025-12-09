@@ -7,6 +7,7 @@ import '../services/api_service.dart';
 import 'profile_screen.dart';
 import 'notification_screen.dart';
 import 'invoice_list_screen.dart';
+import 'payment_history_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -154,7 +155,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           const SizedBox(height: 20),
           _buildStatisticsCards(),
           const SizedBox(height: 20),
-          _buildFeatureCards(),
+          _buildQuickActions(),
+          const SizedBox(height: 20),
+          _buildRecentActivity(),
           const SizedBox(height: 20),
           _buildGabungButton(),
           const SizedBox(height: 20),
@@ -282,7 +285,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildBanner() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
-      height: 180,
+      height: 220,
+      width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         image: const DecorationImage(
@@ -304,7 +308,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ],
           ),
         ),
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -324,7 +328,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfileScreen(),
+                  ),
+                );
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF00BCD4),
                 foregroundColor: Colors.white,
@@ -337,7 +348,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
               child: const Text(
-                'Skala Kami',
+                'Lihat Profil Saya',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
@@ -348,7 +359,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildStatisticsCards() {
-    // Get data from API response
     final invoices = _dashboardData?['invoices'] ?? {};
     final totalInvoices = invoices['total'] ?? 0;
     final unpaidInvoices = invoices['unpaid'] ?? 0;
@@ -423,6 +433,222 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
           const SizedBox(height: 8),
           Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickActions() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Akses Cepat',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _buildQuickActionButton(
+                  icon: Icons.description,
+                  label: 'Lihat Semua\nInvoice',
+                  color: const Color(0xFF2196F3),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const InvoiceListScreen(),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildQuickActionButton(
+                  icon: Icons.payment,
+                  label: 'Lihat Riwayat\nPembayaran',
+                  color: const Color(0xFF4CAF50),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const PaymentHistoryScreen(),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickActionButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: color, size: 28),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRecentActivity() {
+    final recentInvoices = _dashboardData?['recent_invoices'] ?? [];
+    final recentPayments = _dashboardData?['recent_payments'] ?? [];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Aktivitas Terbaru',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 12),
+
+          // Recent Invoices
+          if (recentInvoices.isNotEmpty) ...[
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.description,
+                        size: 20,
+                        color: Colors.blue[700],
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Invoice Terbaru',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Total ${recentInvoices.length} invoice baru',
+                    style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+
+          // Recent Payments
+          if (recentPayments.isNotEmpty) ...[
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.payment, size: 20, color: Colors.green[700]),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Pembayaran Terbaru',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Total ${recentPayments.length} pembayaran baru',
+                    style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                  ),
+                ],
+              ),
+            ),
+          ],
+
+          // Empty state
+          if (recentInvoices.isEmpty && recentPayments.isEmpty)
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Center(
+                child: Text(
+                  'Belum ada aktivitas terbaru',
+                  style: TextStyle(color: Colors.grey[600]),
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -603,25 +829,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildGabungButton() {
     return Center(
-      child: ElevatedButton(
+      child: ElevatedButton.icon(
         onPressed: () {
-          // Handle Gabung button
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Fitur Gabung coming soon')),
+            const SnackBar(
+              content: Text('Hubungi admin untuk bantuan lebih lanjut'),
+              duration: Duration(seconds: 2),
+            ),
           );
         },
+        icon: const Icon(Icons.help_outline),
+        label: const Text(
+          'Bantuan & Dukungan',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF00BCD4),
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(25),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
           elevation: 2,
-        ),
-        child: const Text(
-          'Gabung',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
         ),
       ),
     );
