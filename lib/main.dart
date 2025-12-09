@@ -16,7 +16,7 @@ void main() {
       debugPrint('Platform initialization failed: $e');
     }
   }
-  
+
   runApp(const MyApp());
 }
 
@@ -36,4 +36,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-

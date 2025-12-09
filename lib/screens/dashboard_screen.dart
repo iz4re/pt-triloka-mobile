@@ -6,6 +6,7 @@ import '../services/user_session.dart';
 import '../services/api_service.dart';
 import 'login_screen.dart';
 import 'profile_screen.dart';
+import 'notification_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -17,12 +18,12 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 0;
   User? user;
-  
+
   // Dashboard data state
   bool _isLoading = true;
   Map<String, dynamic>? _dashboardData;
   String? _errorMessage;
-  
+
   final ApiService _apiService = ApiService();
 
   @override
@@ -31,16 +32,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
     user = UserSession().currentUser;
     _loadDashboardData();
   }
-  
+
   Future<void> _loadDashboardData() async {
     try {
       setState(() {
         _isLoading = true;
         _errorMessage = null;
       });
-      
+
       final response = await _apiService.getDashboardSummary();
-      
+
       if (response['success'] == true) {
         setState(() {
           _dashboardData = response['data'];
@@ -48,7 +49,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         });
       } else {
         setState(() {
-          _errorMessage = response['message'] ?? 'Failed to load dashboard data';
+          _errorMessage =
+              response['message'] ?? 'Failed to load dashboard data';
           _isLoading = false;
         });
       }
@@ -64,9 +66,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
     setState(() {
       _selectedIndex = index;
     });
-    
-    // Handle navigation based on index
-    // For now, only index 0 shows the dashboard content
+
+    // Navigate to notification screen when notification tab is tapped
+    if (index == 3) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const NotificationScreen()),
+      ).then((_) {
+        // Reset to dashboard tab after returning
+        setState(() {
+          _selectedIndex = 0;
+        });
+      });
+    }
   }
 
   @override
@@ -74,7 +86,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       body: SafeArea(
-        child: _selectedIndex == 0 
+        child: _selectedIndex == 0
             ? _buildDashboardContent()
             : _buildPlaceholderContent(),
       ),
@@ -92,7 +104,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       );
     }
-    
+
     // Show error message
     if (_errorMessage != null) {
       return Center(
@@ -118,7 +130,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       );
     }
-    
+
     // Show dashboard content
     return SingleChildScrollView(
       child: Column(
@@ -142,7 +154,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildPlaceholderContent() {
     String title = '';
     IconData icon = Icons.home;
-    
+
     switch (_selectedIndex) {
       case 1:
         title = 'Upload Dokumen';
@@ -157,7 +169,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         icon = Icons.notifications;
         break;
     }
-    
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -173,10 +185,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Coming Soon',
-            style: TextStyle(color: Colors.grey),
-          ),
+          const Text('Coming Soon', style: TextStyle(color: Colors.grey)),
         ],
       ),
     );
@@ -217,9 +226,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               // Navigate to profile screen
               await Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const ProfileScreen(),
-                ),
+                MaterialPageRoute(builder: (context) => const ProfileScreen()),
               );
               // Refresh user data after returning
               setState(() {
@@ -237,10 +244,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (user?.profilePhoto != null && user!.profilePhoto!.isNotEmpty) {
       try {
         Uint8List bytes = base64Decode(user!.profilePhoto!);
-        return CircleAvatar(
-          radius: 18,
-          backgroundImage: MemoryImage(bytes),
-        );
+        return CircleAvatar(radius: 18, backgroundImage: MemoryImage(bytes));
       } catch (e) {
         return _buildInitialsAvatar();
       }
@@ -304,10 +308,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             const SizedBox(height: 8),
             const Text(
               'Profesional Menyelesaikan, Cermat Mengelola\n#TrilokaTepat',
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 12,
-              ),
+              style: TextStyle(color: Colors.white70, fontSize: 12),
             ),
             const SizedBox(height: 16),
             ElevatedButton(
@@ -339,7 +340,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final invoices = _dashboardData?['invoices'] ?? {};
     final totalInvoices = invoices['total'] ?? 0;
     final unpaidInvoices = invoices['unpaid'] ?? 0;
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
@@ -409,13 +410,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ],
           ),
           const SizedBox(height: 8),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[600],
-            ),
-          ),
+          Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
         ],
       ),
     );
@@ -426,13 +421,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: _buildOverdueCard(),
-              ),
-            ],
-          ),
+          Row(children: [Expanded(child: _buildOverdueCard())]),
           const SizedBox(height: 12),
           Row(
             children: [
@@ -440,7 +429,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: _buildFeatureCard(
                   title: 'Manajemen Invoice',
                   subtitle: 'Kelola & Monitor\nInvoice',
-                  imageUrl: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&q=80',
+                  imageUrl:
+                      'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&q=80',
                   gradient: const LinearGradient(
                     colors: [Color(0xFF1E3A8A), Color(0xFF3B82F6)],
                   ),
@@ -451,7 +441,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: _buildFeatureCard(
                   title: 'Pembayaran',
                   subtitle: 'Kelola & Tracking\nPembayaran',
-                  imageUrl: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&q=80',
+                  imageUrl:
+                      'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&q=80',
                   gradient: const LinearGradient(
                     colors: [Color(0xFF065F46), Color(0xFF10B981)],
                   ),
@@ -466,7 +457,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: _buildFeatureCard(
                   title: 'Manajemen Stok',
                   subtitle: 'Kelola Inventaris\nBarang',
-                  imageUrl: 'https://images.unsplash.com/photo-1553413077-190dd305871c?w=400&q=80',
+                  imageUrl:
+                      'https://images.unsplash.com/photo-1553413077-190dd305871c?w=400&q=80',
                   gradient: const LinearGradient(
                     colors: [Color(0xFF7C2D12), Color(0xFFEA580C)],
                   ),
@@ -477,7 +469,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: _buildFeatureCard(
                   title: 'Laporan Keuangan',
                   subtitle: 'Analisa & Export\nData',
-                  imageUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&q=80',
+                  imageUrl:
+                      'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&q=80',
                   gradient: const LinearGradient(
                     colors: [Color(0xFF1E40AF), Color(0xFF3B82F6)],
                   ),
@@ -524,17 +517,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
             children: [
               Text(
                 '5',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
               ),
               Text(
                 'Overdue',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey,
-                ),
+                style: TextStyle(fontSize: 12, color: Colors.grey),
               ),
             ],
           ),
@@ -552,9 +539,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return GestureDetector(
       onTap: () {
         // Handle feature card tap
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('$title coming soon')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('$title coming soon')));
       },
       child: Container(
         height: 120,
@@ -593,10 +580,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               const SizedBox(height: 4),
               Text(
                 subtitle,
-                style: const TextStyle(
-                  color: Colors.white70,
-                  fontSize: 10,
-                ),
+                style: const TextStyle(color: Colors.white70, fontSize: 10),
               ),
             ],
           ),
@@ -620,18 +604,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(25),
           ),
-          padding: const EdgeInsets.symmetric(
-            horizontal: 48,
-            vertical: 14,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 14),
           elevation: 2,
         ),
         child: const Text(
           'Gabung',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
         ),
       ),
     );
@@ -655,11 +633,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildNavItem(
-                icon: Icons.home,
-                index: 0,
-                label: 'Home',
-              ),
+              _buildNavItem(icon: Icons.home, index: 0, label: 'Home'),
               _buildNavItem(
                 icon: Icons.description,
                 index: 1,
@@ -690,7 +664,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     bool showBadge = false,
   }) {
     final bool isSelected = _selectedIndex == index;
-    
+
     return GestureDetector(
       onTap: () => _onNavigationTap(index),
       child: Container(
@@ -703,21 +677,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
               children: [
                 Icon(
                   icon,
-                  color: isSelected 
-                      ? const Color(0xFF00BCD4)
-                      : Colors.grey,
+                  color: isSelected ? const Color(0xFF00BCD4) : Colors.grey,
                   size: 28,
                 ),
                 const SizedBox(height: 4),
                 Text(
                   label,
                   style: TextStyle(
-                    color: isSelected 
-                        ? const Color(0xFF00BCD4)
-                        : Colors.grey,
+                    color: isSelected ? const Color(0xFF00BCD4) : Colors.grey,
                     fontSize: 10,
-                    fontWeight: isSelected 
-                        ? FontWeight.bold 
+                    fontWeight: isSelected
+                        ? FontWeight.bold
                         : FontWeight.normal,
                   ),
                 ),

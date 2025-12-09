@@ -45,7 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (result.user != null) {
         await UserSession().setUser(result.user!);
       }
-      
+
       // Navigate to dashboard
       if (mounted) {
         Navigator.of(context).pushReplacement(
@@ -55,10 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result.message),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text(result.message), backgroundColor: Colors.red),
       );
     }
   }
@@ -99,10 +96,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 8),
                 const Text(
                   'Sign in to continue to your account',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.grey),
                 ),
                 const SizedBox(height: 32),
                 // Login/Sign up tabs
@@ -152,10 +146,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: const Text(
                             'Sign up',
                             textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey,
-                            ),
+                            style: TextStyle(fontSize: 16, color: Colors.grey),
                           ),
                         ),
                       ),
@@ -179,7 +170,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   decoration: InputDecoration(
                     hintText: 'name@example.com',
                     hintStyle: const TextStyle(color: Colors.grey),
-                    prefixIcon: const Icon(Icons.email_outlined, color: Colors.grey),
+                    prefixIcon: const Icon(
+                      Icons.email_outlined,
+                      color: Colors.grey,
+                    ),
                     filled: true,
                     fillColor: const Color(0xFFF5F5F5),
                     border: OutlineInputBorder(
@@ -231,10 +225,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   decoration: InputDecoration(
                     hintText: '••••••••',
                     hintStyle: const TextStyle(color: Colors.grey),
-                    prefixIcon: const Icon(Icons.lock_outline, color: Colors.grey),
+                    prefixIcon: const Icon(
+                      Icons.lock_outline,
+                      color: Colors.grey,
+                    ),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                        _isPasswordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
                         color: Colors.grey,
                       ),
                       onPressed: () {
@@ -296,7 +295,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               ),
                               SizedBox(width: 8),
-                              Icon(Icons.arrow_forward, color: Colors.white, size: 20),
+                              Icon(
+                                Icons.arrow_forward,
+                                color: Colors.white,
+                                size: 20,
+                              ),
                             ],
                           ),
                   ),
@@ -310,10 +313,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       padding: EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
                         'Or continue with',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey,
-                        ),
+                        style: TextStyle(fontSize: 12, color: Colors.grey),
                       ),
                     ),
                     Expanded(child: Divider(color: Color(0xFFE0E0E0))),
@@ -393,10 +393,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     const Text(
                       "Don't have an account? ",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey,
-                      ),
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                     GestureDetector(
                       onTap: () {

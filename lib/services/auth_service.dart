@@ -128,9 +128,5 @@ class AuthResult {
   final String message;
   final User? user;
 
-  AuthResult({
-    required this.success,
-    required this.message,
-    this.user,
-  });
+  AuthResult({required this.success, required this.message, this.user});
 }

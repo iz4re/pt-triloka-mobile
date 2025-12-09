@@ -46,7 +46,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (result.success) {
       // Go back to login screen
       Navigator.of(context).pop();
-      
+
       // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -58,10 +58,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     } else {
       // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result.message),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text(result.message), backgroundColor: Colors.red),
       );
     }
   }
@@ -102,10 +99,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 8),
                 const Text(
                   'Sign up to get started',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.grey),
                 ),
                 const SizedBox(height: 32),
                 // Login/Sign up tabs
@@ -133,10 +127,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           child: const Text(
                             'Login',
                             textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey,
-                            ),
+                            style: TextStyle(fontSize: 16, color: Colors.grey),
                           ),
                         ),
                       ),
@@ -181,7 +172,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   decoration: InputDecoration(
                     hintText: 'John',
                     hintStyle: const TextStyle(color: Colors.grey),
-                    prefixIcon: const Icon(Icons.person_outline, color: Colors.grey),
+                    prefixIcon: const Icon(
+                      Icons.person_outline,
+                      color: Colors.grey,
+                    ),
                     filled: true,
                     fillColor: const Color(0xFFF5F5F5),
                     border: OutlineInputBorder(
@@ -217,7 +211,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   decoration: InputDecoration(
                     hintText: 'name@example.com',
                     hintStyle: const TextStyle(color: Colors.grey),
-                    prefixIcon: const Icon(Icons.email_outlined, color: Colors.grey),
+                    prefixIcon: const Icon(
+                      Icons.email_outlined,
+                      color: Colors.grey,
+                    ),
                     filled: true,
                     fillColor: const Color(0xFFF5F5F5),
                     border: OutlineInputBorder(
@@ -256,10 +253,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   decoration: InputDecoration(
                     hintText: '••••••••',
                     hintStyle: const TextStyle(color: Colors.grey),
-                    prefixIcon: const Icon(Icons.lock_outline, color: Colors.grey),
+                    prefixIcon: const Icon(
+                      Icons.lock_outline,
+                      color: Colors.grey,
+                    ),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                        _isPasswordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
                         color: Colors.grey,
                       ),
                       onPressed: () {
@@ -324,7 +326,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                               ),
                               SizedBox(width: 8),
-                              Icon(Icons.arrow_forward, color: Colors.white, size: 20),
+                              Icon(
+                                Icons.arrow_forward,
+                                color: Colors.white,
+                                size: 20,
+                              ),
                             ],
                           ),
                   ),
@@ -338,10 +344,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       padding: EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
                         'Or continue with',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey,
-                        ),
+                        style: TextStyle(fontSize: 12, color: Colors.grey),
                       ),
                     ),
                     Expanded(child: Divider(color: Color(0xFFE0E0E0))),

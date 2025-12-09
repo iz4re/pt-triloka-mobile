@@ -6,101 +6,85 @@ import 'dart:convert';
 class ApiService {
   static final ApiService _instance = ApiService._internal();
   factory ApiService() => _instance;
-  
+
   late Dio _dio;
   final _storage = const FlutterSecureStorage();
-  
+
   ApiService._internal() {
-    _dio = Dio(BaseOptions(
-      baseUrl: ApiConfig.baseUrl,
-      connectTimeout: ApiConfig.connectTimeout,
-      receiveTimeout: ApiConfig.receiveTimeout,
-      headers: {
-        'Accept': 'application/json',
-      },
-      contentType: Headers.jsonContentType,  // Let Dio handle Content-Type
-      responseType: ResponseType.json,
-    ));
-    
+    _dio = Dio(
+      BaseOptions(
+        baseUrl: ApiConfig.baseUrl,
+        connectTimeout: ApiConfig.connectTimeout,
+        receiveTimeout: ApiConfig.receiveTimeout,
+        headers: {'Accept': 'application/json'},
+        contentType: Headers.jsonContentType, // Let Dio handle Content-Type
+        responseType: ResponseType.json,
+      ),
+    );
+
     // Add interceptors
-    _dio.interceptors.add(InterceptorsWrapper(
-      onRequest: (options, handler) async {
-        // Add auth token to requests
-        final token = await getToken();
-        if (token != null) {
-          options.headers['Authorization'] = 'Bearer $token';
-        }
-        return handler.next(options);
-      },
-      onError: (error, handler) async {
-        // Handle errors globally
-        if (error.response?.statusCode == 401) {
-          // Unauthorized - clear token and navigate to login
-          await clearToken();
-        }
-        return handler.next(error);
-      },
-    ));
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) async {
+          // Add auth token to requests
+          final token = await getToken();
+          if (token != null) {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
+          return handler.next(options);
+        },
+        onError: (error, handler) async {
+          // Handle errors globally
+          if (error.response?.statusCode == 401) {
+            // Unauthorized - clear token and navigate to login
+            await clearToken();
+          }
+          return handler.next(error);
+        },
+      ),
+    );
   }
-  
+
   // Token management
   Future<void> saveToken(String token) async {
     await _storage.write(key: 'auth_token', value: token);
   }
-  
+
   Future<String?> getToken() async {
     return await _storage.read(key: 'auth_token');
   }
-  
+
   Future<void> clearToken() async {
     await _storage.delete(key: 'auth_token');
   }
-  
+
   Future<bool> isLoggedIn() async {
     final token = await getToken();
     return token != null;
   }
-  
+
   // Auth APIs
   Future<Map<String, dynamic>> login(String email, String password) async {
     try {
-      print('LOGIN ATTEMPT - Email: $email'); // DEBUG
-      print('LOGIN ATTEMPT - Password length: ${password.length}'); // DEBUG
-      
-      final requestData = {
-        'email': email,
-        'password': password,
-      };
-      
-      print('LOGIN REQUEST DATA: $requestData'); // DEBUG
-      
-      final response = await _dio.post(
-        ApiConfig.login,
-        data: requestData,  // Let Dio handle JSON encoding
-      );
-      
-      print('LOGIN RESPONSE: ${response.statusCode}'); // DEBUG
-      print('LOGIN RESPONSE DATA: ${response.data}'); // DEBUG
-      
+      final requestData = {'email': email, 'password': password};
+
+      final response = await _dio.post(ApiConfig.login, data: requestData);
+
       if (response.data['success'] == true) {
         // Save token
         final token = response.data['data']['token'];
         await saveToken(token);
       }
-      
+
       return response.data;
     } on DioException catch (e) {
-      print('LOGIN ERROR: ${e.message}'); // DEBUG
-      print('LOGIN ERROR RESPONSE: ${e.response?.data}'); // DEBUG
-      print('LOGIN ERROR REQUEST: ${e.requestOptions.data}'); // DEBUG
-      
       if (e.response != null) {
         return e.response!.data;
       }
       rethrow;
     }
   }
-  
+
   Future<Map<String, dynamic>> register({
     required String name,
     required String email,
@@ -125,7 +109,7 @@ class ApiService {
           if (companyName != null) 'company_name': companyName,
         },
       );
-      
+
       // Don't save token - user needs to login manually
       return response.data;
     } on DioException catch (e) {
@@ -135,7 +119,7 @@ class ApiService {
       rethrow;
     }
   }
-  
+
   Future<Map<String, dynamic>> logout() async {
     try {
       final response = await _dio.post(ApiConfig.logout);
@@ -149,7 +133,7 @@ class ApiService {
       rethrow;
     }
   }
-  
+
   Future<Map<String, dynamic>> getUser() async {
     try {
       final response = await _dio.get(ApiConfig.user);
@@ -161,7 +145,7 @@ class ApiService {
       rethrow;
     }
   }
-  
+
   Future<Map<String, dynamic>> updateProfile({
     String? name,
     String? phone,
@@ -186,7 +170,7 @@ class ApiService {
       rethrow;
     }
   }
-  
+
   // Dashboard API
   Future<Map<String, dynamic>> getDashboardSummary() async {
     try {
@@ -199,7 +183,7 @@ class ApiService {
       rethrow;
     }
   }
-  
+
   // Invoice APIs
   Future<Map<String, dynamic>> getInvoices() async {
     try {
@@ -212,7 +196,7 @@ class ApiService {
       rethrow;
     }
   }
-  
+
   Future<Map<String, dynamic>> getInvoiceDetail(int id) async {
     try {
       final response = await _dio.get(ApiConfig.invoiceDetail(id));
@@ -224,7 +208,7 @@ class ApiService {
       rethrow;
     }
   }
-  
+
   // Notification APIs
   Future<Map<String, dynamic>> getNotifications() async {
     try {
@@ -237,7 +221,7 @@ class ApiService {
       rethrow;
     }
   }
-  
+
   Future<Map<String, dynamic>> markNotificationAsRead(int id) async {
     try {
       final response = await _dio.put(ApiConfig.markAsRead(id));
@@ -249,7 +233,7 @@ class ApiService {
       rethrow;
     }
   }
-  
+
   Future<Map<String, dynamic>> markAllNotificationsAsRead() async {
     try {
       final response = await _dio.put(ApiConfig.markAllAsRead);
