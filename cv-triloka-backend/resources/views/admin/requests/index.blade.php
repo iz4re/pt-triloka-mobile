@@ -3,6 +3,15 @@
 @section('page-title', 'Project Requests')
 
 @section('content')
+<!-- Header with Export Button -->
+<div class="flex justify-between items-center mb-6">
+    <div></div>
+    <a href="{{ route('admin.export.requests.csv', request()->all()) }}" 
+       class="px-4 py-2 bg-green-600 text-white rounded-md hover:opacity-90">
+        📊 Export to CSV
+    </a>
+</div>
+
 <!-- Filters -->
 <div class="bg-white rounded-lg shadow mb-6">
     <form method="GET" action="{{ route('admin.requests.index') }}" class="p-6">

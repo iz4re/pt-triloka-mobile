@@ -16,8 +16,8 @@ class ProjectRequestController extends Controller
      */
     public function index(Request $request)
     {
-        $query = ProjectRequest::where('klien_id', $request->user()->id)
-            ->with(['klien', 'documents'])
+        $query = ProjectRequest::where('user_id', $request->user()->id)
+            ->with(['klien', 'documents'])  // Re-enabled after table creation
             ->orderBy('created_at', 'desc');
 
         // Filter by status if provided
@@ -56,7 +56,8 @@ class ProjectRequestController extends Controller
         }
 
         $projectRequest = ProjectRequest::create([
-            'klien_id' => $request->user()->id,
+            'user_id' => $request->user()->id,
+            'klien_id' => $request->user()->id,  // Add this - same as user_id for clients
             'title' => $request->title,
             'type' => $request->type,
             'description' => $request->description,
@@ -67,7 +68,7 @@ class ProjectRequestController extends Controller
         ]);
 
         // Load relationships
-        $projectRequest->load(['klien', 'documents']);
+        $projectRequest->load(['klien', 'documents']);  // Re-enabled after table creation
 
         return response()->json([
             'success' => true,
@@ -81,7 +82,7 @@ class ProjectRequestController extends Controller
      */
     public function show(Request $request, $id)
     {
-        $projectRequest = ProjectRequest::with(['klien', 'documents', 'quotations'])
+        $projectRequest = ProjectRequest::with(['klien', 'documents'])  // Removed quotations temporarily
             ->find($id);
 
         if (!$projectRequest) {
@@ -92,7 +93,7 @@ class ProjectRequestController extends Controller
         }
 
         // Check if user owns this request
-        if ($projectRequest->klien_id !== $request->user()->id) {
+        if ($projectRequest->user_id !== $request->user()->id) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized access'
@@ -120,7 +121,7 @@ class ProjectRequestController extends Controller
         }
 
         // Check ownership
-        if ($projectRequest->klien_id !== $request->user()->id) {
+        if ($projectRequest->user_id !== $request->user()->id) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized access'
@@ -185,7 +186,7 @@ class ProjectRequestController extends Controller
         }
 
         // Check ownership
-        if ($projectRequest->klien_id !== $request->user()->id) {
+        if ($projectRequest->user_id !== $request->user()->id) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized access'
@@ -223,7 +224,7 @@ class ProjectRequestController extends Controller
         }
 
         // Check ownership
-        if ($projectRequest->klien_id !== $request->user()->id) {
+        if ($projectRequest->user_id !== $request->user()->id) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized access'
@@ -281,7 +282,7 @@ class ProjectRequestController extends Controller
         }
 
         // Check ownership through project request
-        if ($document->request->klien_id !== $request->user()->id) {
+        if ($document->request->user_id !== $request->user()->id) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized access'

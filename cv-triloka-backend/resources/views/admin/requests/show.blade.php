@@ -205,12 +205,20 @@
         <div class="bg-white rounded-lg shadow p-6">
             <h3 class="font-semibold text-gray-900 mb-4">Quick Actions</h3>
             <div class="space-y-2">
+                <form method="POST" action="{{ route('admin.survey-invoice.create', $request->id) }}">
+                    @csrf
+                    <button type="submit" class="w-full px-4 py-2 text-left text-sm font-medium text-white rounded-md hover:opacity-90" style="background-color: #10B981;">
+                        💰 Create Survey Invoice (Rp 500k)
+                    </button>
+                </form>
                 <button class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 rounded-md">
                     📧 Email Client
                 </button>
-                <button class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 rounded-md">
+                <a href="{{ route('admin.quotations.create', $request->id) }}" 
+                   class="block w-full px-4 py-2 text-left text-sm text-white rounded-md hover:opacity-90" 
+                   style="background-color: #6C5DD3;">
                     📄 Create Quotation
-                </button>
+                </a>
             </div>
         </div>
     </div>

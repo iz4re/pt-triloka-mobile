@@ -53,6 +53,10 @@ class ApiConfig {
   static String deleteDocument(int documentId) =>
       '/request-documents/$documentId';
 
+  // Quotations
+  static const String quotations = '/quotations';
+  static String quotationDetail(int id) => '/quotations/$id';
+
   // Timeout settings
   static const Duration connectTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);

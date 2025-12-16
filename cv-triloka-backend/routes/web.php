@@ -32,8 +32,41 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('requests/{id}', [App\Http\Controllers\Admin\RequestController::class, 'show'])->name('requests.show');
             Route::post('requests/{id}/status', [App\Http\Controllers\Admin\RequestController::class, 'updateStatus'])->name('requests.updateStatus');
             
+            // Invoices (Read-Only)
+            Route::get('invoices', [App\Http\Controllers\Admin\InvoiceController::class, 'index'])->name('invoices.index');
+            Route::get('invoices/{id}', [App\Http\Controllers\Admin\InvoiceController::class, 'show'])->name('invoices.show');
+            
+            // Documents
+            Route::get('documents', [App\Http\Controllers\Admin\DocumentController::class, 'index'])->name('documents.index');
+            Route::get('documents/{id}', [App\Http\Controllers\Admin\DocumentController::class, 'show'])->name('documents.show');
+            Route::post('documents/{id}/verify', [App\Http\Controllers\Admin\DocumentController::class, 'updateVerification'])->name('documents.verify');
+            Route::get('documents/{id}/download', [App\Http\Controllers\Admin\DocumentController::class, 'download'])->name('documents.download');
+            
+            // Payments
+            Route::get('payments', [App\Http\Controllers\Admin\PaymentController::class, 'index'])->name('payments.index');
+            Route::get('payments/{id}', [App\Http\Controllers\Admin\PaymentController::class, 'show'])->name('payments.show');
+            Route::post('payments/{id}/verify', [App\Http\Controllers\Admin\PaymentController::class, 'verify'])->name('payments.verify');
+            Route::post('payments/{id}/reject', [App\Http\Controllers\Admin\PaymentController::class, 'reject'])->name('payments.reject');
+            
+            // Survey Invoices
+            Route::post('requests/{requestId}/survey-invoice', [App\Http\Controllers\Admin\SurveyInvoiceController::class, 'create'])->name('survey-invoice.create');
+            Route::get('requests/{requestId}/survey-fee-status', [App\Http\Controllers\Admin\SurveyInvoiceController::class, 'checkSurveyFeePaid'])->name('survey-invoice.check');
+            
+            // Quotations
+            Route::get('quotations', [App\Http\Controllers\Admin\QuotationController::class, 'index'])->name('quotations.index');
+            Route::get('requests/{requestId}/quotations/create', [App\Http\Controllers\Admin\QuotationController::class, 'create'])->name('quotations.create');
+            Route::post('quotations', [App\Http\Controllers\Admin\QuotationController::class, 'store'])->name('quotations.store');
+            Route::get('quotations/{id}', [App\Http\Controllers\Admin\QuotationController::class, 'show'])->name('quotations.show');
+            Route::post('quotations/{id}/status', [App\Http\Controllers\Admin\QuotationController::class, 'updateStatus'])->name('quotations.updateStatus');
+            Route::delete('quotations/{id}', [App\Http\Controllers\Admin\QuotationController::class, 'destroy'])->name('quotations.destroy');
+            Route::post('quotations/{id}/create-invoice', [App\Http\Controllers\Admin\InvoiceController::class, 'createFromQuotation'])->name('quotations.createInvoice');
+            
+            // Exports
+            Route::get('export/invoice/{id}/print', [App\Http\Controllers\Admin\ExportController::class, 'invoicePrint'])->name('export.invoice.print');
+            Route::get('export/requests/csv', [App\Http\Controllers\Admin\ExportController::class, 'requestsCSV'])->name('export.requests.csv');
+            Route::get('export/invoices/csv', [App\Http\Controllers\Admin\ExportController::class, 'invoicesCSV'])->name('export.invoices.csv');
+            
             // Future routes for resources
-            // Route::resource('users', UserController::class);
         });
     });
 });

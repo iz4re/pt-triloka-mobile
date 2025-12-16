@@ -7,8 +7,8 @@ import '../services/api_service.dart';
 import 'profile_screen.dart';
 import 'notification_screen.dart';
 import 'invoice_list_screen.dart';
-import 'payment_history_screen.dart';
 import 'project_request_list_screen.dart';
+import 'quotation_list_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -74,6 +74,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const InvoiceListScreen()),
+      ).then((_) {
+        setState(() {
+          _selectedIndex = 0;
+        });
+      });
+    }
+
+    // Navigate to quotation list when quotation tab is tapped
+    if (index == 2) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const QuotationListScreen()),
       ).then((_) {
         setState(() {
           _selectedIndex = 0;
@@ -177,8 +189,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         icon = Icons.description;
         break;
       case 2:
-        title = 'Pembayaran';
-        icon = Icons.attach_money;
+        title = 'Quotation';
+        icon = Icons.receipt_long;
         break;
       case 3:
         title = 'Notifikasi';
@@ -470,14 +482,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
               const SizedBox(width: 12),
               Expanded(
                 child: _buildQuickActionButton(
-                  icon: Icons.payment,
-                  label: 'Lihat Riwayat\nPembayaran',
+                  icon: Icons.receipt_long,
+                  label: 'Lihat Semua\nQuotation',
                   color: const Color(0xFF4CAF50),
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const PaymentHistoryScreen(),
+                        builder: (context) => const QuotationListScreen(),
                       ),
                     );
                   },
@@ -903,9 +915,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 label: 'Dokumen',
               ),
               _buildNavItem(
-                icon: Icons.attach_money,
+                icon: Icons.receipt_long,
                 index: 2,
-                label: 'Pembayaran',
+                label: 'Quotation',
               ),
               _buildNavItem(
                 icon: Icons.notifications,

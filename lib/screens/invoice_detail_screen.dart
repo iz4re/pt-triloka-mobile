@@ -111,6 +111,10 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
         children: [
           _buildHeaderSection(),
           const SizedBox(height: 12),
+          if (_invoice!.status != 'paid' && _invoice!.vaNumber != null)
+            _buildPaymentInstructionCard(),
+          if (_invoice!.status != 'paid' && _invoice!.vaNumber != null)
+            const SizedBox(height: 12),
           _buildItemsSection(),
           const SizedBox(height: 12),
           _buildSummarySection(),
@@ -120,6 +124,181 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
         ],
       ),
     );
+  }
+
+  Widget _buildPaymentInstructionCard() {
+    return Container(
+      color: const Color(0xFFF3F4F6),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF2196F3).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.account_balance,
+                  color: Color(0xFF2196F3),
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Instruksi Pembayaran',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      'Transfer ke Virtual Account',
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.grey.shade300),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Bank',
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  _invoice!.vaBank ?? 'BCA',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Divider(height: 16),
+                const Text(
+                  'Nomor Virtual Account',
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        _formatVANumber(_invoice!.vaNumber!),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'monospace',
+                          color: Color(0xFF2196F3),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.copy, size: 20),
+                      onPressed: () {
+                        // Copy to clipboard
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('VA Number disalin!')),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                const Divider(height: 16),
+                const Text(
+                  'Jumlah',
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  _formatCurrency(_invoice!.total),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF4CAF50),
+                  ),
+                ),
+                if (_invoice!.vaExpiresAt != null) ...[
+                  const Divider(height: 16),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.access_time,
+                        size: 16,
+                        color: Colors.orange,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Berlaku sampai ${_formatDate(_invoice!.vaExpiresAt!)}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.orange,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Navigator.pushNamed(
+                  context,
+                  '/payment-upload',
+                  arguments: _invoice,
+                );
+              },
+              icon: const Icon(Icons.upload_file, color: Colors.white),
+              label: const Text(
+                'Saya Sudah Bayar',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF4CAF50),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatVANumber(String vaNumber) {
+    // Format: 8808 0001 234567
+    if (vaNumber.length >= 14) {
+      return '${vaNumber.substring(0, 4)} ${vaNumber.substring(4, 8)} ${vaNumber.substring(8)}';
+    }
+    return vaNumber;
   }
 
   Widget _buildHeaderSection() {
@@ -237,7 +416,11 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
           if (_invoice!.tax > 0) _buildSummaryRow('Pajak', _invoice!.tax),
           if (_invoice!.discount > 0) ...[
             const SizedBox(height: 8),
-            _buildSummaryRow('Diskon', -_invoice!.discount, isDiscount: true),
+            _buildSummaryRow(
+              _invoice!.isSurveyFeeApplied ? 'Diskon (Survey Fee)' : 'Diskon',
+              -_invoice!.discount,
+              isDiscount: true,
+            ),
           ],
           const Divider(height: 24),
           Row(

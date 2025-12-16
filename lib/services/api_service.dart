@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'api_config.dart';
-import 'dart:convert';
+import 'dart:io';
 
 class ApiService {
   static final ApiService _instance = ApiService._internal();
@@ -17,7 +17,7 @@ class ApiService {
         connectTimeout: ApiConfig.connectTimeout,
         receiveTimeout: ApiConfig.receiveTimeout,
         headers: {'Accept': 'application/json'},
-        contentType: Headers.jsonContentType, // Let Dio handle Content-Type
+        contentType: Headers.jsonContentType,
         responseType: ResponseType.json,
       ),
     );
@@ -447,6 +447,80 @@ class ApiService {
       if (e.response != null) {
         return e.response!.data;
       }
+      rethrow;
+    }
+  }
+
+  // Payment submission with proof image
+  Future<Map<String, dynamic>> submitPayment({
+    required int invoiceId,
+    required double amount,
+    required File proofImage,
+    String? notes,
+  }) async {
+    try {
+      FormData formData = FormData.fromMap({
+        'invoice_id': invoiceId,
+        'amount': amount,
+        'payment_date': DateTime.now().toIso8601String().split(
+          'T',
+        )[0], // YYYY-MM-DD
+        'payment_method': 'transfer',
+        'proof_image': await MultipartFile.fromFile(
+          proofImage.path,
+          filename:
+              'payment_proof_${DateTime.now().millisecondsSinceEpoch}.jpg',
+        ),
+        if (notes != null) 'notes': notes,
+      });
+
+      final response = await _dio.post('/payments/submit', data: formData);
+      return response.data;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        return e.response!.data;
+      }
+      rethrow;
+    }
+  }
+
+  // === QUOTATIONS ===
+  Future<Map<String, dynamic>> getQuotations({String? status}) async {
+    try {
+      final queryParams = status != null ? {'status': status} : null;
+      final response = await _dio.get(
+        ApiConfig.quotations,
+        queryParameters: queryParams,
+      );
+      return response.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> getQuotationDetail(int id) async {
+    try {
+      final response = await _dio.get('${ApiConfig.quotations}/$id');
+      return response.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> approveQuotation(int id) async {
+    try {
+      final response = await _dio.post('${ApiConfig.quotations}/$id/approve');
+      return response.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> rejectQuotation(int id) async {
+    try {
+      final response = await _dio.post('${ApiConfig.quotations}/$id/reject');
+      return response.data;
+    } catch (e) {
       rethrow;
     }
   }

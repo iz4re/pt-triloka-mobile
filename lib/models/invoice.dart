@@ -19,6 +19,12 @@ class Invoice {
   final double remainingBalance;
   final String createdAt;
   final String updatedAt;
+  final String? vaNumber;
+  final String? vaBank;
+  final String? vaExpiresAt;
+  final String invoiceType;
+  final int? parentInvoiceId;
+  final bool isSurveyFeeApplied;
 
   Invoice({
     required this.id,
@@ -41,6 +47,12 @@ class Invoice {
     this.remainingBalance = 0,
     required this.createdAt,
     required this.updatedAt,
+    this.vaNumber,
+    this.vaBank,
+    this.vaExpiresAt,
+    this.invoiceType = 'project',
+    this.parentInvoiceId,
+    this.isSurveyFeeApplied = false,
   });
 
   factory Invoice.fromJson(Map<String, dynamic> json) {
@@ -93,6 +105,14 @@ class Invoice {
       remainingBalance: remainingBalance,
       createdAt: json['created_at'] ?? '',
       updatedAt: json['updated_at'] ?? '',
+      vaNumber: json['va_number'],
+      vaBank: json['va_bank'],
+      vaExpiresAt: json['va_expires_at'],
+      invoiceType: json['invoice_type'] ?? 'project',
+      parentInvoiceId: json['parent_invoice_id'],
+      isSurveyFeeApplied:
+          json['is_survey_fee_applied'] == true ||
+          json['is_survey_fee_applied'] == 1,
     );
   }
 

@@ -25,6 +25,11 @@ class DashboardController extends Controller
             'total_clients' => User::where('role', 'klien')->count(),
             'total_revenue' => Invoice::where('status', 'paid')
                 ->where('created_at', '>=', $thisMonth)
+                ->where('invoice_type', 'project')  // Exclude survey fees from revenue
+                ->sum('total'),
+            'pending_payments' => Payment::where('status', 'pending')->count(),
+            'survey_fees_collected' => Invoice::where('status', 'paid')
+                ->where('invoice_type', 'survey')
                 ->sum('total'),
         ];
 
@@ -41,6 +46,13 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        return view('admin.dashboard', compact('stats', 'recentRequests', 'pendingApprovals'));
+        // Recent payments (new!)
+        $recentPayments = Payment::with(['invoice.klien'])
+            ->where('status', 'pending')
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        return view('admin.dashboard', compact('stats', 'recentRequests', 'pendingApprovals', 'recentPayments'));
     }
 }

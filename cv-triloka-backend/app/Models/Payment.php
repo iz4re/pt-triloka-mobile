@@ -18,10 +18,14 @@ class Payment extends Model
         'notes',
         'proof_image',
         'created_by',
+        'status',
+        'verified_by',
+        'verified_at',
     ];
 
     protected $casts = [
         'payment_date' => 'date',
+        'verified_at' => 'datetime',
         'amount' => 'decimal:2',
     ];
 

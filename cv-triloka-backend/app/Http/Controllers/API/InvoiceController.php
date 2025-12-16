@@ -159,9 +159,15 @@ class InvoiceController extends Controller
             ], 403);
         }
 
+        // Prepare response with VA fields
+        $invoiceData = $invoice->toArray();
+        $invoiceData['va_number'] = $invoice->va_number;
+        $invoiceData['va_bank'] = $invoice->va_bank;
+        $invoiceData['va_expires_at'] = $invoice->va_expires_at;
+
         return response()->json([
             'success' => true,
-            'data' => $invoice,
+            'data' => $invoiceData,
         ]);
     }
 

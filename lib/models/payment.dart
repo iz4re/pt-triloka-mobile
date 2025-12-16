@@ -9,6 +9,7 @@ class Payment {
   final String paymentMethod;
   final String? notes;
   final String? proofImage;
+  final String status; // pending, verified, rejected
   final int createdBy;
   final String? creatorName;
   final String createdAt;
@@ -25,6 +26,7 @@ class Payment {
     required this.paymentMethod,
     this.notes,
     this.proofImage,
+    required this.status,
     required this.createdBy,
     this.creatorName,
     required this.createdAt,
@@ -52,6 +54,7 @@ class Payment {
       paymentMethod: json['payment_method'] ?? 'other',
       notes: json['notes'],
       proofImage: json['proof_image'],
+      status: json['status'] ?? 'pending',
       createdBy: json['created_by'],
       creatorName: json['creator']?['name'],
       createdAt: json['created_at'] ?? '',
@@ -69,6 +72,7 @@ class Payment {
       'payment_method': paymentMethod,
       'notes': notes,
       'proof_image': proofImage,
+      'status': status,
       'created_by': createdBy,
       'created_at': createdAt,
       'updated_at': updatedAt,

@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'screens/login_screen.dart';
+import 'screens/payment_upload_screen.dart';
+import 'models/invoice.dart';
 
 void main() {
   // Initialize sqflite for desktop platforms
@@ -33,6 +35,15 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const LoginScreen(),
+      onGenerateRoute: (settings) {
+        if (settings.name == '/payment-upload') {
+          final invoice = settings.arguments as Invoice;
+          return MaterialPageRoute(
+            builder: (context) => PaymentUploadScreen(invoice: invoice),
+          );
+        }
+        return null;
+      },
     );
   }
 }

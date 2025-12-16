@@ -11,6 +11,7 @@ class ProjectRequest extends Model
 
     protected $fillable = [
         'request_number',
+        'user_id',
         'klien_id',
         'title',
         'type',
@@ -42,22 +43,22 @@ class ProjectRequest extends Model
     // Relationships
     public function klien()
     {
-        return $this->belongsTo(User::class, 'klien_id');
+        return $this->belongsTo(User::class, 'klien_id');  // FIXED: was user_id
     }
 
     public function documents()
     {
-        return $this->hasMany(RequestDocument::class, 'request_id');
+        return $this->hasMany(RequestDocument::class, 'project_request_id');  // FIXED: specify foreign key
     }
 
     public function quotations()
     {
-        return $this->hasMany(Quotation::class, 'request_id');
+        return $this->hasMany(Quotation::class, 'project_request_id');  // FIXED
     }
 
     public function activeQuotation()
     {
-        return $this->hasOne(Quotation::class, 'request_id')
+        return $this->hasOne(Quotation::class, 'project_request_id')  // FIXED
             ->where('status', '!=', 'rejected')
             ->latest();
     }

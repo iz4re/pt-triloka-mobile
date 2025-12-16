@@ -46,36 +46,40 @@
                         Project Requests
                     </a>
 
-                    <a href="#" 
-                       class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100">
+                    <a href="{{ route('admin.documents.index') }}" 
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.documents.*') ? 'text-white' : 'text-gray-700 hover:bg-gray-100' }}"
+                       style="{{ request()->routeIs('admin.documents.*') ? 'background-color: #6C5DD3;' : '' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                         </svg>
                         Documents
                     </a>
 
-                    <a href="#" 
-                       class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100">
-                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                        </svg>
-                        Users
-                    </a>
-
-                    <a href="#" 
-                       class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100">
+                    <a href="{{ route('admin.invoices.index') }}" 
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.invoices.*') ? 'text-white' : 'text-gray-700 hover:bg-gray-100' }}"
+                       style="{{ request()->routeIs('admin.invoices.*') ? 'background-color: #6C5DD3;' : '' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                         Invoices
                     </a>
 
-                    <a href="#" 
-                       class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100">
+                    <a href="{{ route('admin.payments.index') }}" 
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.payments.*') ? 'text-white' : 'text-gray-700 hover:bg-gray-100' }}"
+                       style="{{ request()->routeIs('admin.payments.*') ? 'background-color: #6C5DD3;' : '' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
                         Payments
+                    </a>
+
+                    <a href="{{ route('admin.quotations.index') }}" 
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.quotations.*') ? 'text-white' : 'text-gray-700 hover:bg-gray-100' }}"
+                       style="{{ request()->routeIs('admin.quotations.*') ? 'background-color: #6C5DD3;' : '' }}">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Quotations
                     </a>
                 </nav>
 

@@ -8,9 +8,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AdminAccess
 {
-    /**
-     * Handle an incoming request.
-     */
     public function handle(Request $request, Closure $next): Response
     {
         // Check if user is authenticated

@@ -9,6 +9,7 @@ use App\Http\Controllers\API\ItemController;
 use App\Http\Controllers\API\DashboardController;
 use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\ProjectRequestController;
+use App\Http\Controllers\API\QuotationController;
 
 // Public routes
 Route::post('/register', [AuthController::class, 'register']);
@@ -35,10 +36,36 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // Payments
     Route::get('/payments', [PaymentController::class, 'index']);
-    Route::post('/payments', [PaymentController::class, 'store']);
+    Route::post('/payments/submit', [PaymentController::class, 'submitPayment']); // Submit with proof
     Route::get('/payments/{id}', [PaymentController::class, 'show']);
-    Route::delete('/payments/{id}', [PaymentController::class, 'destroy']);
-    Route::get('/invoices/{invoiceId}/payments', [PaymentController::class, 'byInvoice']);
+    
+    // Quotations
+    Route::get('/quotations', [QuotationController::class, 'index']);
+    Route::get('/quotations/{id}', [QuotationController::class, 'show']);
+    Route::post('/quotations/{id}/approve', [QuotationController::class, 'approve']);
+    Route::post('/quotations/{id}/reject', [QuotationController::class, 'reject']);
+    
+    // Debug endpoint (remove in production)
+    Route::get('/debug/quotations', function(Request $request) {
+        $userId = $request->user()->id;
+        $quotations = \App\Models\Quotation::with('projectRequest')->get();
+        
+        return response()->json([
+            'current_user_id' => $userId,
+            'total_quotations' => $quotations->count(),
+            'quotations' => $quotations->map(function($q) use ($userId) {
+                return [
+                    'id' => $q->id,
+                    'number' => $q->quotation_number,
+                    'status' => $q->status,
+                    'project_id' => $q->project_request_id,
+                    'project_user_id' => $q->projectRequest->user_id ?? null,
+                    'project_klien_id' => $q->projectRequest->klien_id ?? null,
+                    'matches_user' => ($q->projectRequest->user_id == $userId || $q->projectRequest->klien_id == $userId),
+                ];
+            })
+        ]);
+    });
     
     // Items (Inventory)
     Route::get('/items', [ItemController::class, 'index']);

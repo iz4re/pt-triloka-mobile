@@ -11,14 +11,12 @@ class RequestDocument extends Model
     use HasFactory;
 
     protected $fillable = [
-        'request_id',
+        'project_request_id',  // Fixed: was request_id
         'document_type',
         'file_path',
-        'file_name',
-        'file_type',
-        'file_size',
         'description',
         'verification_status',
+        'verification_notes',
         'verified_by',
         'verified_at',
     ];
@@ -28,9 +26,9 @@ class RequestDocument extends Model
     ];
 
     // Relationships
-    public function request()
+    public function projectRequest()
     {
-        return $this->belongsTo(ProjectRequest::class, 'request_id');
+        return $this->belongsTo(ProjectRequest::class, 'project_request_id');  // Fixed: was request_id
     }
 
     public function verifier()
