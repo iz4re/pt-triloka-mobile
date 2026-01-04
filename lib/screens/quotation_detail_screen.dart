@@ -50,7 +50,10 @@ class _QuotationDetailScreenState extends State<QuotationDetailScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Setujui Quotation?'),
+        title: const Text(
+          'Setujui Quotation?',
+          style: TextStyle(color: Colors.white),
+        ),
         content: const Text(
           'Anda yakin ingin menyetujui quotation ini? Status project request akan berubah menjadi Disetujui.',
         ),
@@ -229,7 +232,9 @@ class _QuotationDetailScreenState extends State<QuotationDetailScreen> {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: _getStatusColor(_quotation!.status).withOpacity(0.1),
+                    color: _getStatusColor(
+                      _quotation!.status,
+                    ).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: _getStatusColor(_quotation!.status),
@@ -295,7 +300,7 @@ class _QuotationDetailScreenState extends State<QuotationDetailScreen> {
                   _buildItemRow(item),
                 ],
               );
-            }).toList(),
+            }),
           ],
         ),
       ),
@@ -334,12 +339,17 @@ class _QuotationDetailScreenState extends State<QuotationDetailScreen> {
         ),
         const SizedBox(height: 8),
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              '${item.quantity} ${item.unit} × ${NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0).format(item.unitPrice)}',
-              style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+            Expanded(
+              flex: 2,
+              child: Text(
+                '${item.quantity} ${item.unit} × ${NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0).format(item.unitPrice)}',
+                style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
             ),
+            const SizedBox(width: 8),
             Text(
               NumberFormat.currency(
                 locale: 'id_ID',
@@ -417,22 +427,29 @@ class _QuotationDetailScreenState extends State<QuotationDetailScreen> {
   }
 
   Widget _buildNotesCard() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Catatan',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              _quotation!.notes!,
-              style: TextStyle(fontSize: 13, color: Colors.grey[700]),
-            ),
-          ],
+    return SizedBox(
+      width: double.infinity,
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Catatan',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                _quotation!.notes!,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[700],
+                  height: 1.6,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -476,7 +493,10 @@ class _QuotationDetailScreenState extends State<QuotationDetailScreen> {
                       color: Colors.white,
                     ),
                   )
-                : const Text('Setujui Quotation'),
+                : const Text(
+                    'Setujui Quotation',
+                    style: TextStyle(color: Colors.white),
+                  ),
           ),
         ),
       ],
@@ -487,7 +507,7 @@ class _QuotationDetailScreenState extends State<QuotationDetailScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.orange.withOpacity(0.1),
+        color: Colors.orange.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: Colors.orange),
       ),

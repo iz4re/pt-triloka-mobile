@@ -10,7 +10,7 @@ class Quotation extends Model
     use HasFactory;
 
     protected $fillable = [
-        'project_request_id',  // FIXED: was request_id
+        'project_request_id',
         'quotation_number',
         'quotation_date',
         'version',
@@ -54,7 +54,7 @@ class Quotation extends Model
     // Relationships
     public function projectRequest()
     {
-        return $this->belongsTo(ProjectRequest::class, 'project_request_id');  // FIXED
+        return $this->belongsTo(ProjectRequest::class, 'project_request_id');  
     }
 
     public function creator()

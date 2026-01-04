@@ -69,8 +69,7 @@ class AuthService {
       );
 
       if (response['success'] == true) {
-        // Don't save user to local storage - they need to login manually
-        // Just return success message
+       
         return AuthResult(
           success: true,
           message: response['message'] ?? 'Registration successful!',

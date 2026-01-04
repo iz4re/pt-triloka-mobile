@@ -384,8 +384,9 @@ class ApiService {
       if (description != null) data['description'] = description;
       if (location != null) data['location'] = location;
       if (expectedBudget != null) data['expected_budget'] = expectedBudget;
-      if (expectedTimeline != null)
+      if (expectedTimeline != null) {
         data['expected_timeline'] = expectedTimeline;
+      }
 
       final response = await _dio.put(
         ApiConfig.projectRequestDetail(id),

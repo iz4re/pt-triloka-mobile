@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:intl/intl.dart';
 import 'package:file_picker/file_picker.dart';
 import '../models/project_request.dart';
@@ -101,7 +100,7 @@ class _ProjectRequestDetailScreenState
 
   Future<void> _uploadDocument() async {
     try {
-      print('DEBUG: Starting file picker...');
+      debugPrint('DEBUG: Starting file picker...');
 
       // Pick file
       FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -109,12 +108,12 @@ class _ProjectRequestDetailScreenState
         allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx'],
       );
 
-      print('DEBUG: File picker result: ${result != null}');
+      debugPrint('DEBUG: File picker result: ${result != null}');
 
       if (result == null || !mounted) return;
 
       final file = result.files.first;
-      print('DEBUG: File name: ${file.name}, size: ${file.size}');
+      debugPrint('DEBUG: File name: ${file.name}, size: ${file.size}');
 
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
@@ -131,7 +130,9 @@ class _ProjectRequestDetailScreenState
 
       // Get file bytes from picker
       if (file.bytes == null) {
-        print('DEBUG: File bytes is null - file picker didnt return bytes');
+        debugPrint(
+          'DEBUG: File bytes is null - file picker didnt return bytes',
+        );
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -144,12 +145,12 @@ class _ProjectRequestDetailScreenState
       }
 
       final fileBytes = file.bytes!;
-      print('DEBUG: File bytes length: ${fileBytes.length}');
+      debugPrint('DEBUG: File bytes length: ${fileBytes.length}');
 
       // Check mounted before showing dialog
       if (!mounted) return;
 
-      print('DEBUG: Showing metadata dialog...');
+      debugPrint('DEBUG: Showing metadata dialog...');
 
       // Show dialog for metadata
       final metadata = await showDialog<Map<String, String?>>(
@@ -157,12 +158,12 @@ class _ProjectRequestDetailScreenState
         builder: (context) => _UploadMetadataDialog(fileName: file.name),
       );
 
-      print('DEBUG: Metadata: $metadata');
+      debugPrint('DEBUG: Metadata: $metadata');
 
       if (metadata == null || !mounted) return;
 
       // Upload
-      print('DEBUG: Starting upload...');
+      debugPrint('DEBUG: Starting upload...');
       setState(() => _isUploading = true);
 
       final response = await _apiService.uploadRequestDocument(
@@ -173,12 +174,12 @@ class _ProjectRequestDetailScreenState
         description: metadata['description'],
       );
 
-      print('DEBUG: Upload response: $response');
+      debugPrint('DEBUG: Upload response: $response');
 
       if (!mounted) return;
 
       if (response['success'] == true) {
-        print('DEBUG: Upload successful!');
+        debugPrint('DEBUG: Upload successful!');
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Dokumen berhasil diupload'),
@@ -187,8 +188,8 @@ class _ProjectRequestDetailScreenState
         );
         _loadRequestDetail();
       } else {
-        print('DEBUG: Upload failed: ${response['message']}');
-        print('DEBUG: Validation errors: ${response['errors']}');
+        debugPrint('DEBUG: Upload failed: ${response['message']}');
+        debugPrint('DEBUG: Validation errors: ${response['errors']}');
 
         // Show detailed error message
         String errorMsg = response['message'] ?? 'Upload failed';
@@ -198,7 +199,7 @@ class _ProjectRequestDetailScreenState
         throw Exception(errorMsg);
       }
     } catch (e) {
-      print('DEBUG: Upload error: $e');
+      debugPrint('DEBUG: Upload error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
@@ -365,7 +366,9 @@ class _ProjectRequestDetailScreenState
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: _getStatusColor(_request!.status).withOpacity(0.1),
+                    color: _getStatusColor(
+                      _request!.status,
+                    ).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(
@@ -606,7 +609,7 @@ class _ProjectRequestDetailScreenState
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.1),
+                  color: statusColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -705,7 +708,7 @@ class _UploadMetadataDialogState extends State<_UploadMetadataDialog> {
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              value: _selectedType,
+              initialValue: _selectedType,
               decoration: const InputDecoration(
                 labelText: 'Jenis Dokumen',
                 border: OutlineInputBorder(),

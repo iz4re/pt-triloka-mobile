@@ -49,7 +49,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
     } catch (e) {
       // Fallback to local session data if API fails
-      print('Error loading profile: $e');
+      debugPrint('Error loading profile: $e');
     } finally {
       setState(() => _isLoading = false);
     }
@@ -96,7 +96,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           if (_isLoading)
             Container(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withValues(alpha: 0.3),
               child: const Center(child: CircularProgressIndicator()),
             ),
         ],
@@ -315,7 +315,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: iconColor.withOpacity(0.1),
+                color: iconColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(icon, color: iconColor, size: 24),
@@ -352,19 +352,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _showLogoutDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Logout'),
         content: const Text('Are you sure you want to logout?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () async {
+              Navigator.pop(dialogContext); // Close dialog first
               await UserSession().clearUser();
               if (mounted) {
-                Navigator.of(context).pushAndRemoveUntil(
+                final navigator = Navigator.of(context);
+                navigator.pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => const LoginScreen()),
                   (route) => false,
                 );

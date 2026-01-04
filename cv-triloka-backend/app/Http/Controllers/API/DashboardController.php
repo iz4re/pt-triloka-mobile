@@ -9,6 +9,7 @@ use App\Models\Item;
 use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class DashboardController extends Controller
 {
@@ -18,12 +19,17 @@ class DashboardController extends Controller
     public function summary(Request $request)
     {
         $user = $request->user();
-
-        if ($user->isAdmin()) {
-            return $this->adminDashboard();
-        } else {
-            return $this->klienDashboard($user);
-        }
+        
+        // Cache dashboard untuk 5 menit
+        $cacheKey = "dashboard_summary_user_{$user->id}";
+        
+        return Cache::remember($cacheKey, 300, function() use ($user) {
+            if ($user->isAdmin()) {
+                return $this->adminDashboard();
+            } else {
+                return $this->klienDashboard($user);
+            }
+        });
     }
 
     /**
@@ -113,66 +119,71 @@ class DashboardController extends Controller
      */
     private function klienDashboard($user)
     {
-        // Invoice statistics for this klien
-        $myInvoices = Invoice::where('klien_id', $user->id);
+        $userId = $user->id;
         
-        $totalInvoices = $myInvoices->count();
-        $unpaidInvoices = (clone $myInvoices)->where('status', 'unpaid')->count();
-        $overdueInvoices = (clone $myInvoices)->where('status', 'overdue')->count();
-        $paidInvoices = (clone $myInvoices)->where('status', 'paid')->count();
+        // OPTIMIZED: 1 query untuk semua count + sum invoice statistics
+        $stats = Invoice::where('klien_id', $userId)
+            ->selectRaw('
+                COUNT(*) as total_invoices,
+                SUM(CASE WHEN status = "unpaid" THEN 1 ELSE 0 END) as unpaid_count,
+                SUM(CASE WHEN status = "overdue" THEN 1 ELSE 0 END) as overdue_count,
+                SUM(CASE WHEN status = "paid" THEN 1 ELSE 0 END) as paid_count,
+                SUM(CASE WHEN status = "paid" THEN total ELSE 0 END) as total_paid,
+                SUM(CASE WHEN status IN ("unpaid", "overdue") THEN total ELSE 0 END) as total_outstanding
+            ')
+            ->first();
 
-        // Financial statistics
-        $totalPaid = (clone $myInvoices)->where('status', 'paid')->sum('total');
-        $totalOutstanding = (clone $myInvoices)->whereIn('status', ['unpaid', 'overdue'])->sum('total');
+        // OPTIMIZED: 1 query untuk payment statistics
+        $paymentStats = Payment::whereHas('invoice', function($q) use ($userId) {
+                $q->where('klien_id', $userId);
+            })
+            ->selectRaw('
+                COUNT(*) as total_payments,
+                SUM(CASE WHEN MONTH(created_at) = ? AND YEAR(created_at) = ? THEN 1 ELSE 0 END) as this_month_payments
+            ', [now()->month, now()->year])
+            ->first();
 
-        // My payments
-        $myPayments = Payment::whereHas('invoice', function($q) use ($user) {
-            $q->where('klien_id', $user->id);
-        });
-
-        $totalPaymentsMade = $myPayments->count();
-        $thisMonthPayments = (clone $myPayments)->whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)
-            ->count();
-
-        // Upcoming due invoices
-        $upcomingDue = Invoice::where('klien_id', $user->id)
+        // Upcoming due invoices - limit 5 dengan select columns yang diperlukan saja
+        $upcomingDue = Invoice::where('klien_id', $userId)
             ->whereIn('status', ['unpaid', 'draft'])
             ->whereBetween('due_date', [now(), now()->addDays(7)])
+            ->select('id', 'invoice_number', 'total', 'due_date', 'status')
+            ->limit(5)
             ->get();
 
-        // Recent payments (last 5)
-        $recentPayments = Payment::whereHas('invoice', function($q) use ($user) {
-                $q->where('klien_id', $user->id);
+        // Recent payments - limit 5 dengan eager loading yang optimal
+        $recentPayments = Payment::whereHas('invoice', function($q) use ($userId) {
+                $q->where('klien_id', $userId);
             })
-            ->with('invoice')
+            ->with('invoice:id,invoice_number,total')
+            ->select('id', 'invoice_id', 'amount', 'payment_date', 'status')
             ->latest()
-            ->take(5)
+            ->limit(5)
             ->get();
 
-        // Recent invoices (last 5)
-        $recentInvoices = Invoice::where('klien_id', $user->id)
-            ->with('creator')
+        // Recent invoices - limit 5 dengan select columns yang diperlukan saja
+        $recentInvoices = Invoice::where('klien_id', $userId)
+            ->select('id', 'invoice_number', 'total', 'status', 'due_date', 'created_at')
             ->latest()
-            ->take(5)
+            ->limit(5)
             ->get();
 
         return response()->json([
             'success' => true,
             'data' => [
                 'invoices' => [
-                    'total' => $totalInvoices,
-                    'unpaid' => $unpaidInvoices,
-                    'overdue' => $overdueInvoices,
-                    'paid' => $paidInvoices,
+                    'total' => $stats->total_invoices ?? 0,
+                    'unpaid' => $stats->unpaid_count ?? 0,
+                    'overdue' => $stats->overdue_count ?? 0,
+                    'paid' => $stats->paid_count ?? 0,
                 ],
                 'financials' => [
-                    'total_paid' => $totalPaid,
-                    'total_outstanding' => $totalOutstanding,
+                    'total_paid' => $stats->total_paid ?? 0,
+                    'total_outstanding' => $stats->total_outstanding ?? 0,
                 ],
                 'payments' => [
-                    'total' => $totalPaymentsMade,
-                    'this_month' => $thisMonthPayments,
+                    'total' => $paymentStats->total_payments ?? 0,
+                    'this_month' => $paymentStats->this_month_payments ?? 0,
                 ],
                 'upcoming_due_invoices' => $upcomingDue,
                 'recent_payments' => $recentPayments,

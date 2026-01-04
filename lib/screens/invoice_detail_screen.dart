@@ -138,7 +138,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2196F3).withOpacity(0.1),
+                  color: const Color(0xFF2196F3).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(
@@ -349,7 +349,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          ..._invoice!.items.map((item) => _buildItemRow(item)).toList(),
+          ..._invoice!.items.map((item) => _buildItemRow(item)),
         ],
       ),
     );
@@ -563,7 +563,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: color, width: 1.5),
       ),

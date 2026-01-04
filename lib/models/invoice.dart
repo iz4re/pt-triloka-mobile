@@ -57,7 +57,7 @@ class Invoice {
 
   factory Invoice.fromJson(Map<String, dynamic> json) {
     // Helper to safely parse numbers (handles both int, double, and string)
-    double _parseDouble(dynamic value) {
+    double parseDouble(dynamic value) {
       if (value == null) return 0.0;
       if (value is double) return value;
       if (value is int) return value.toDouble();
@@ -77,11 +77,11 @@ class Invoice {
     double totalPaid = 0;
     if (json['payments'] != null) {
       for (var payment in json['payments']) {
-        totalPaid += _parseDouble(payment['amount']);
+        totalPaid += parseDouble(payment['amount']);
       }
     }
 
-    double total = _parseDouble(json['total']);
+    double total = parseDouble(json['total']);
     double remainingBalance = total - totalPaid;
 
     return Invoice(
@@ -93,9 +93,9 @@ class Invoice {
       creatorName: json['creator']?['name'],
       invoiceDate: json['invoice_date'] ?? '',
       dueDate: json['due_date'] ?? '',
-      subtotal: _parseDouble(json['subtotal']),
-      tax: _parseDouble(json['tax']),
-      discount: _parseDouble(json['discount']),
+      subtotal: parseDouble(json['subtotal']),
+      tax: parseDouble(json['tax']),
+      discount: parseDouble(json['discount']),
       total: total,
       status: json['status'] ?? 'unpaid',
       notes: json['notes'],
@@ -191,7 +191,7 @@ class InvoiceItem {
 
   factory InvoiceItem.fromJson(Map<String, dynamic> json) {
     // Helper to safely parse numbers
-    double _parseDouble(dynamic value) {
+    double parseDouble(dynamic value) {
       if (value == null) return 0.0;
       if (value is double) return value;
       if (value is int) return value.toDouble();
@@ -205,9 +205,9 @@ class InvoiceItem {
       itemId: json['item_id'],
       itemName: json['item_name'] ?? '',
       description: json['description'],
-      quantity: _parseDouble(json['quantity']),
-      unitPrice: _parseDouble(json['unit_price']),
-      subtotal: _parseDouble(json['subtotal']),
+      quantity: parseDouble(json['quantity']),
+      unitPrice: parseDouble(json['unit_price']),
+      subtotal: parseDouble(json['subtotal']),
       createdAt: json['created_at'] ?? '',
       updatedAt: json['updated_at'] ?? '',
     );

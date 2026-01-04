@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import '../models/user.dart';
 import '../services/user_session.dart';
 import '../services/api_service.dart';
+import '../widgets/app_bottom_navigation.dart';
 import 'profile_screen.dart';
-import 'notification_screen.dart';
 import 'invoice_list_screen.dart';
 import 'project_request_list_screen.dart';
 import 'quotation_list_screen.dart';
@@ -19,6 +19,7 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 0;
+  int _currentNavIndex = 0;
   User? user;
 
   // Dashboard data state
@@ -64,47 +65,41 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
-  void _onNavigationTap(int index) {
+  void _onNavTap(int index) {
+    if (index == 0) {
+      // Already on home
+      return;
+    }
+
+    // Set temporarily to show active state
     setState(() {
-      _selectedIndex = index;
+      _currentNavIndex = index;
     });
 
-    // Navigate to invoice list when invoice tab is tapped
-    if (index == 1) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const InvoiceListScreen()),
-      ).then((_) {
-        setState(() {
-          _selectedIndex = 0;
-        });
-      });
+    Widget destination;
+    switch (index) {
+      case 1:
+        destination = const QuotationListScreen();
+        break;
+      case 2:
+        destination = const InvoiceListScreen();
+        break;
+      case 3:
+        destination = const ProfileScreen();
+        break;
+      default:
+        return;
     }
 
-    // Navigate to quotation list when quotation tab is tapped
-    if (index == 2) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const QuotationListScreen()),
-      ).then((_) {
-        setState(() {
-          _selectedIndex = 0;
-        });
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => destination),
+    ).then((_) {
+      // Reset to home tab after returning
+      setState(() {
+        _currentNavIndex = 0;
       });
-    }
-
-    // Navigate to notification screen when notification tab is tapped
-    if (index == 3) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const NotificationScreen()),
-      ).then((_) {
-        // Reset to dashboard tab after returning
-        setState(() {
-          _selectedIndex = 0;
-        });
-      });
-    }
+    });
   }
 
   @override
@@ -116,7 +111,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ? _buildDashboardContent()
             : _buildPlaceholderContent(),
       ),
-      bottomNavigationBar: _buildBottomNavigation(),
+      bottomNavigationBar: AppBottomNavigation(
+        currentIndex: _currentNavIndex,
+        onTap: _onNavTap,
+      ),
     );
   }
 
@@ -302,11 +300,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
       width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        image: const DecorationImage(
-          image: NetworkImage(
-            'https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?w=800&q=80',
-          ),
-          fit: BoxFit.cover,
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF6C5DD3), Color(0xFF8E7CE8), Color(0xFF6C5DD3)],
         ),
       ),
       child: Container(
@@ -316,8 +313,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Colors.black.withOpacity(0.6),
-              Colors.black.withOpacity(0.8),
+              Colors.black.withValues(alpha: 0.6),
+              Colors.black.withValues(alpha: 0.8),
             ],
           ),
         ),
@@ -415,7 +412,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -429,7 +426,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: iconColor.withOpacity(0.1),
+                  color: iconColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(icon, color: iconColor, size: 20),
@@ -538,7 +535,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -549,7 +546,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: color, size: 28),
@@ -590,7 +587,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 2),
                   ),
@@ -636,7 +633,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 2),
                   ),
@@ -688,179 +685,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildFeatureCards() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        children: [
-          Row(children: [Expanded(child: _buildOverdueCard())]),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _buildFeatureCard(
-                  title: 'Manajemen Invoice',
-                  subtitle: 'Kelola & Monitor\nInvoice',
-                  imageUrl:
-                      'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&q=80',
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF1E3A8A), Color(0xFF3B82F6)],
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildFeatureCard(
-                  title: 'Pembayaran',
-                  subtitle: 'Kelola & Tracking\nPembayaran',
-                  imageUrl:
-                      'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&q=80',
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF065F46), Color(0xFF10B981)],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _buildFeatureCard(
-                  title: 'Manajemen Stok',
-                  subtitle: 'Kelola Inventaris\nBarang',
-                  imageUrl:
-                      'https://images.unsplash.com/photo-1553413077-190dd305871c?w=400&q=80',
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF7C2D12), Color(0xFFEA580C)],
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildFeatureCard(
-                  title: 'Laporan Keuangan',
-                  subtitle: 'Analisa & Export\nData',
-                  imageUrl:
-                      'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&q=80',
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF1E40AF), Color(0xFF3B82F6)],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildOverdueCard() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color(0xFFEF4444).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Icon(
-              Icons.trending_up,
-              color: Color(0xFFEF4444),
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 16),
-          const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '5',
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                'Overdue',
-                style: TextStyle(fontSize: 12, color: Colors.grey),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFeatureCard({
-    required String title,
-    required String subtitle,
-    required String imageUrl,
-    required Gradient gradient,
-  }) {
-    return GestureDetector(
-      onTap: () {
-        // Handle feature card tap
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('$title coming soon')));
-      },
-      child: Container(
-        height: 120,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          image: DecorationImage(
-            image: NetworkImage(imageUrl),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.black.withOpacity(0.4),
-                Colors.black.withOpacity(0.7),
-              ],
-            ),
-          ),
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                style: const TextStyle(color: Colors.white70, fontSize: 10),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildGabungButton() {
     return Center(
       child: ElevatedButton.icon(
@@ -885,115 +709,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
           elevation: 2,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBottomNavigation() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildNavItem(icon: Icons.home, index: 0, label: 'Home'),
-              _buildNavItem(
-                icon: Icons.description,
-                index: 1,
-                label: 'Dokumen',
-              ),
-              _buildNavItem(
-                icon: Icons.receipt_long,
-                index: 2,
-                label: 'Quotation',
-              ),
-              _buildNavItem(
-                icon: Icons.notifications,
-                index: 3,
-                label: 'Notifikasi',
-                showBadge: true,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem({
-    required IconData icon,
-    required int index,
-    required String label,
-    bool showBadge = false,
-  }) {
-    final bool isSelected = _selectedIndex == index;
-
-    return GestureDetector(
-      onTap: () => _onNavigationTap(index),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  icon,
-                  color: isSelected ? const Color(0xFF00BCD4) : Colors.grey,
-                  size: 28,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  label,
-                  style: TextStyle(
-                    color: isSelected ? const Color(0xFF00BCD4) : Colors.grey,
-                    fontSize: 10,
-                    fontWeight: isSelected
-                        ? FontWeight.bold
-                        : FontWeight.normal,
-                  ),
-                ),
-              ],
-            ),
-            if (showBadge)
-              Positioned(
-                right: -4,
-                top: -4,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                  ),
-                  constraints: const BoxConstraints(
-                    minWidth: 16,
-                    minHeight: 16,
-                  ),
-                  child: const Text(
-                    '3',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-          ],
         ),
       ),
     );

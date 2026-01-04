@@ -33,7 +33,7 @@ class ProjectRequest {
 
   factory ProjectRequest.fromJson(Map<String, dynamic> json) {
     // Helper to safely parse numbers
-    double? _parseDoubleNullable(dynamic value) {
+    double? parseDoubleNullable(dynamic value) {
       if (value == null) return null;
       if (value is double) return value;
       if (value is int) return value.toDouble();
@@ -58,7 +58,7 @@ class ProjectRequest {
       type: json['type'] ?? 'other',
       description: json['description'] ?? '',
       location: json['location'] ?? '',
-      expectedBudget: _parseDoubleNullable(json['expected_budget']),
+      expectedBudget: parseDoubleNullable(json['expected_budget']),
       expectedTimeline: json['expected_timeline'],
       status: json['status'] ?? 'pending',
       documents: documentsList,

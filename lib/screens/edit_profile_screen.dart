@@ -417,7 +417,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: DropdownButtonFormField<String>(
-        value: _gender,
+        initialValue: _gender,
         decoration: InputDecoration(
           labelText: 'Select your gender',
           labelStyle: TextStyle(color: Colors.grey[600]),

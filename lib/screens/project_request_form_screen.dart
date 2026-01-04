@@ -172,7 +172,7 @@ class _ProjectRequestFormScreenState extends State<ProjectRequestFormScreen> {
 
             // Type
             DropdownButtonFormField<String>(
-              value: _selectedType,
+              initialValue: _selectedType,
               decoration: const InputDecoration(
                 labelText: 'Jenis Project *',
                 border: OutlineInputBorder(),

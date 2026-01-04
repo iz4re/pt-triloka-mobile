@@ -27,21 +27,21 @@ class _QuotationListScreenState extends State<QuotationListScreen> {
   Future<void> _loadQuotations() async {
     setState(() => _isLoading = true);
     try {
-      print('Loading quotations with status: $_selectedStatus');
+      debugPrint('Loading quotations with status: $_selectedStatus');
       final response = await _apiService.getQuotations(
         status: _selectedStatus == 'all' ? null : _selectedStatus,
       );
 
-      print('Quotations API Response: $response');
+      debugPrint('Quotations API Response: $response');
 
       if (response['success'] == true && mounted) {
         final List data = response['data'] ?? [];
-        print('Found ${data.length} quotations');
+        debugPrint('Found ${data.length} quotations');
         setState(() {
           _quotations = data.map((json) => Quotation.fromJson(json)).toList();
         });
       } else {
-        print('API success is false or response null');
+        debugPrint('API success is false or response null');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -51,8 +51,8 @@ class _QuotationListScreenState extends State<QuotationListScreen> {
         }
       }
     } catch (e) {
-      print('Error loading quotations: $e');
-      print('Error type: ${e.runtimeType}');
+      debugPrint('Error loading quotations: $e');
+      debugPrint('Error type: ${e.runtimeType}');
       if (mounted) {
         ErrorHandler.showError(context, e);
       }
@@ -204,7 +204,9 @@ class _QuotationListScreenState extends State<QuotationListScreen> {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: _getStatusColor(quotation.status).withOpacity(0.1),
+                      color: _getStatusColor(
+                        quotation.status,
+                      ).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: _getStatusColor(quotation.status),
@@ -233,9 +235,12 @@ class _QuotationListScreenState extends State<QuotationListScreen> {
                   const SizedBox(width: 16),
                   Icon(Icons.calendar_today, size: 14, color: Colors.grey[600]),
                   const SizedBox(width: 4),
-                  Text(
-                    'Valid sampai: ${_formatDate(quotation.validUntil)}',
-                    style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                  Flexible(
+                    child: Text(
+                      'Valid sampai: ${_formatDate(quotation.validUntil)}',
+                      style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ],
               ),

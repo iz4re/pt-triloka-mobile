@@ -35,7 +35,7 @@ class Payment {
 
   factory Payment.fromJson(Map<String, dynamic> json) {
     // Helper to safely parse numbers (handles both int, double, and string)
-    double _parseDouble(dynamic value) {
+    double parseDouble(dynamic value) {
       if (value == null) return 0.0;
       if (value is double) return value;
       if (value is int) return value.toDouble();
@@ -49,7 +49,7 @@ class Payment {
       invoiceId: json['invoice_id'],
       invoiceNumber: json['invoice']?['invoice_number'],
       klienName: json['invoice']?['klien']?['name'],
-      amount: _parseDouble(json['amount']),
+      amount: parseDouble(json['amount']),
       paymentDate: json['payment_date'] ?? '',
       paymentMethod: json['payment_method'] ?? 'other',
       notes: json['notes'],
