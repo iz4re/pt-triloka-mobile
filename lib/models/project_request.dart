@@ -1,7 +1,7 @@
 class ProjectRequest {
   final int id;
   final String requestNumber;
-  final int klienId;
+  final int klienId; 
   final String? klienName;
   final String title;
   final String type;
@@ -52,8 +52,8 @@ class ProjectRequest {
     return ProjectRequest(
       id: json['id'],
       requestNumber: json['request_number'] ?? '',
-      klienId: json['klien_id'],
-      klienName: json['klien']?['name'],
+      klienId: json['user_id'] ?? json['klien_id'] ?? 0, 
+      klienName: json['klien']?['name'] ?? json['user']?['name'], // Handle user relation too
       title: json['title'] ?? '',
       type: json['type'] ?? 'other',
       description: json['description'] ?? '',
@@ -151,7 +151,8 @@ class RequestDocument {
   factory RequestDocument.fromJson(Map<String, dynamic> json) {
     return RequestDocument(
       id: json['id'],
-      requestId: json['request_id'],
+      // FIX 2: Baca project_request_id (kolom baru di DB)
+      requestId: json['project_request_id'] ?? json['request_id'] ?? 0, 
       documentType: json['document_type'] ?? 'other',
       filePath: json['file_path'] ?? '',
       fileName: json['file_name'] ?? '',
@@ -163,6 +164,7 @@ class RequestDocument {
     );
   }
 
+  // ... (Sisa method getDocumentTypeLabel, dll biarin sama)
   String getDocumentTypeLabel() {
     switch (documentType.toLowerCase()) {
       case 'ktp':

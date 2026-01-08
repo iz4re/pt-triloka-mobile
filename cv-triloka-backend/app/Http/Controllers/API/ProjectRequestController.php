@@ -57,7 +57,7 @@ class ProjectRequestController extends Controller
 
         $projectRequest = ProjectRequest::create([
             'user_id' => $request->user()->id,
-            'klien_id' => $request->user()->id,  // Add this - same as user_id for clients
+            // 'klien_id' => $request->user()->id,  // Add this - same as user_id for clients
             'title' => $request->title,
             'type' => $request->type,
             'description' => $request->description,
@@ -250,7 +250,8 @@ class ProjectRequestController extends Controller
         $filePath = $file->storeAs('request-documents', $fileName, 'public');
 
         $document = RequestDocument::create([
-            'request_id' => $projectRequest->id,
+            // 'request_id' => $projectRequest->id,
+            'project_request_id' => $projectRequest->id,
             'document_type' => $request->document_type,
             'file_path' => $filePath,
             'file_name' => $file->getClientOriginalName(),

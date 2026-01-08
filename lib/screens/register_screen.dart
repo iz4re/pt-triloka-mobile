@@ -44,7 +44,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (result.success) {
       // Go back to login screen
-      Navigator.of(context).pop();
+      // Navigator.of(context).pop();
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+      );
 
       // Show success message
       ScaffoldMessenger.of(context).showSnackBar(

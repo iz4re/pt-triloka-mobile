@@ -12,7 +12,7 @@ class ProjectRequest extends Model
     protected $fillable = [
         'request_number',
         'user_id',
-        'klien_id',
+        // 'klien_id',
         'title',
         'type',
         'description',
@@ -43,7 +43,7 @@ class ProjectRequest extends Model
     // Relationships
     public function klien()
     {
-        return $this->belongsTo(User::class, 'klien_id');  // FIXED: was user_id
+        return $this->belongsTo(User::class, 'user_id');  // FIXED: was user_id
     }
 
     public function documents()

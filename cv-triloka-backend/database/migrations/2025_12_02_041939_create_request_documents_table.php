@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('request_documents', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('request_id')->constrained('project_requests')->onDelete('cascade');
+            // $table->foreignId('request_id')->constrained('project_requests')->onDelete('cascade');
+            $table->foreignId('project_request_id')->constrained('project_requests')->onDelete('cascade');
             $table->enum('document_type', ['ktp', 'npwp', 'drawing', 'rab', 'permit', 'photo', 'other'])->default('other');
             $table->string('file_path');
             $table->string('file_name');
