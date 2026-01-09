@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('project_request_id')->constrained('project_requests')->onDelete('cascade');
             $table->string('quotation_number')->unique();
+            $table->date('quotation_date');
             $table->integer('version')->default(1);
             $table->decimal('subtotal', 15, 2)->default(0);
             $table->decimal('tax', 15, 2)->default(0);
