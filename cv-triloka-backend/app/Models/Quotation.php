@@ -12,7 +12,7 @@ class Quotation extends Model
     protected $fillable = [
         'project_request_id',
         'quotation_number',
-        'quotation_date',
+        // 'quotation_date',
         'version',
         'subtotal',
         'tax',
