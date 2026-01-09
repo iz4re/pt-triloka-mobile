@@ -37,8 +37,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         setState(() {
           user = User(
             id: userData['id'],
-            firstName: userData['name']?.split(' ').first ?? 'User',
-            lastName: userData['name']?.split(' ').skip(1).join(' '),
+            firstName: userData['name']?.toString().split(' ').first ?? 'User',
+            lastName: (userData['name']?.toString().split(' ').length ?? 0) > 1 
+                ? userData['name']?.toString().split(' ').skip(1).join(' ') 
+                : '',
             email: userData['email'],
             passwordHash: '',
             phone: userData['phone'],
@@ -134,7 +136,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  user!.email,
+                  user!.email ?? '',
                   style: const TextStyle(color: Colors.white70, fontSize: 14),
                 ),
               ],
