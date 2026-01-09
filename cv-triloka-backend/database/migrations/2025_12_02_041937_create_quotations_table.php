@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('quotations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('request_id')->constrained('project_requests')->onDelete('cascade');
+            $table->foreignId('project_request_id')->constrained('project_requests')->onDelete('cascade');
             $table->string('quotation_number')->unique();
             $table->integer('version')->default(1);
             $table->decimal('subtotal', 15, 2)->default(0);
