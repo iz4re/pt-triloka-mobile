@@ -40,13 +40,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _dobController = TextEditingController(text: user?.dateOfBirth ?? '');
     _gender = user?.gender;
     _profilePhotoBase64 = user?.profilePhoto;
-
-    // Parse existing date if available
     if (user?.dateOfBirth != null && user!.dateOfBirth!.isNotEmpty) {
       try {
         _selectedDate = DateFormat('dd/MM/yyyy').parse(user!.dateOfBirth!);
       } catch (e) {
-        // Invalid date format
       }
     }
   }
@@ -62,21 +59,50 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Future<void> _pickImage() async {
     try {
+      final ImageSource? source = await showDialog<ImageSource>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Select Image Source'),
+            content: const Text('Choose where to pick the image from.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context, ImageSource.camera),
+                child: const Text('Camera'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, ImageSource.gallery),
+                child: const Text('Gallery'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+            ],
+          );
+        },
+      );
+
+      if (source == null) return;
+
       final ImagePicker picker = ImagePicker();
-      final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+      final XFile? image = await picker.pickImage(
+        source: source,
+        maxWidth: 800,
+        maxHeight: 800,
+        imageQuality: 70,
+      );
 
       if (image == null) return;
-
-      // Check file size (max 50MB)
       final fileSize = await image.length();
-      const maxSize = 50 * 1024 * 1024; // 50MB in bytes
+      const maxSize = 2 * 1024 * 1024; 
 
       if (fileSize > maxSize) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'File terlalu besar! Maksimal 50MB. Ukuran file: ${(fileSize / (1024 * 1024)).toStringAsFixed(2)}MB',
+                'File terlalu besar! Maksimal 2MB. Ukuran file: ${(fileSize / (1024 * 1024)).toStringAsFixed(2)}MB',
               ),
               backgroundColor: Colors.red,
             ),
@@ -84,52 +110,30 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         }
         return;
       }
+      final Uint8List bytes = await image.readAsBytes();
+      setState(() {
+        _profilePhotoBase64 = base64Encode(bytes);
+      });
 
-      // Crop the image
-      final croppedFile = await ImageCropper().cropImage(
-        sourcePath: image.path,
-        aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
-        uiSettings: [
-          AndroidUiSettings(
-            toolbarTitle: 'Crop Photo',
-            toolbarColor: const Color(0xFF00BCD4),
-            toolbarWidgetColor: Colors.white,
-            activeControlsWidgetColor: const Color(0xFF00BCD4),
-            initAspectRatio: CropAspectRatioPreset.square,
-            lockAspectRatio: true,
-          ),
-          IOSUiSettings(
-            title: 'Crop Photo',
-            aspectRatioLockEnabled: true,
-            resetAspectRatioEnabled: false,
-          ),
-        ],
-      );
-
-      if (croppedFile != null) {
-        // Read cropped image bytes
-        final bytes = await croppedFile.readAsBytes();
-
-        // Encode to base64
-        setState(() {
-          _profilePhotoBase64 = base64Encode(bytes);
-        });
-
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Photo selected successfully!'),
-              backgroundColor: Colors.green,
-              duration: Duration(seconds: 2),
-            ),
-          );
-        }
-      }
-    } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Failed to pick image: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Photo selected successfully!'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e, stackTrace) {
+      debugPrint('Error picking image: $e');
+      debugPrint('Stack trace: $stackTrace');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to pick image: ${e.toString().split('.').first}'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }
@@ -161,14 +165,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     try {
       final ApiService apiService = ApiService();
-
-      // Prepare full name
       String fullName = _firstNameController.text.trim();
       if (_lastNameController.text.trim().isNotEmpty) {
         fullName += ' ${_lastNameController.text.trim()}';
       }
-
-      // Call API to update profile
       final response = await apiService.updateProfile(
         name: fullName,
         phone: _phoneController.text.trim().isEmpty
@@ -177,7 +177,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       );
 
       if (response['success'] == true) {
-        // Update local user object
         final userData = response['data'];
         final updatedUser = User(
           id: userData['id'],
@@ -192,8 +191,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               : _dobController.text.trim(),
           profilePhoto: _profilePhotoBase64,
         );
-
-        // Update session
         await UserSession().updateUser(updatedUser);
 
         if (mounted) {
