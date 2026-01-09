@@ -109,6 +109,65 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  void _showForgotPasswordDialog() {
+    final emailController = TextEditingController(text: _emailController.text);
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Forgot Password?'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Enter your email and we will send you a reset link.'),
+            const SizedBox(height: 16),
+            TextField(
+              controller: emailController,
+              decoration: const InputDecoration(
+                labelText: 'Email',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final email = emailController.text.trim();
+              if (email.isEmpty) return;
+              
+              Navigator.pop(context);
+              try {
+                await _firebaseAuth.sendPasswordResetEmail(email);
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Reset link sent to your email!'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Failed to send reset link: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            child: const Text('Send Link'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -257,12 +316,15 @@ class _LoginScreenState extends State<LoginScreen> {
                         color: Colors.black,
                       ),
                     ),
-                    Text(
-                      'Forgot?',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: const Color(0xFF6C5DD3),
-                        fontWeight: FontWeight.w500,
+                    GestureDetector(
+                      onTap: _showForgotPasswordDialog,
+                      child: const Text(
+                        'Forgot?',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF6C5DD3),
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                   ],
