@@ -129,7 +129,7 @@ class DashboardController extends Controller
         $userId = $user->id;
         
         // OPTIMIZED: 1 query untuk semua count + sum invoice statistics
-        $stats = Invoice::where('id', $userId)
+        $stats = Invoice::where('klien_id', $userId)
             ->selectRaw('
                 COUNT(*) as total_invoices,
                 SUM(CASE WHEN status = "unpaid" THEN 1 ELSE 0 END) as unpaid_count,
@@ -142,7 +142,7 @@ class DashboardController extends Controller
 
         // OPTIMIZED: 1 query untuk payment statistics
         $paymentStats = Payment::whereHas('invoice', function($q) use ($userId) {
-                $q->where('id', $userId);
+                $q->where('klien_id', $userId);
             })
             ->selectRaw('
                 COUNT(*) as total_payments,
@@ -151,7 +151,7 @@ class DashboardController extends Controller
             ->first();
 
         // Upcoming due invoices - limit 5 dengan select columns yang diperlukan saja
-        $upcomingDue = Invoice::where('id', $userId)
+        $upcomingDue = Invoice::where('klien_id', $userId)
             ->whereIn('status', ['unpaid', 'draft'])
             ->whereBetween('due_date', [now(), now()->addDays(7)])
             ->select('id', 'invoice_number', 'total', 'due_date', 'status')
@@ -160,7 +160,7 @@ class DashboardController extends Controller
 
         // Recent payments - limit 5 dengan eager loading yang optimal
         $recentPayments = Payment::whereHas('invoice', function($q) use ($userId) {
-                $q->where('id', $userId);
+                $q->where('klien_id', $userId);
             })
             ->with('invoice:id,invoice_number,total')
             ->select('id', 'invoice_id', 'amount', 'payment_date', 'status')
@@ -169,7 +169,7 @@ class DashboardController extends Controller
             ->get();
 
         // Recent invoices - limit 5 dengan select columns yang diperlukan saja
-        $recentInvoices = Invoice::where('id', $userId)
+        $recentInvoices = Invoice::where('klien_id', $userId)
             ->select('id', 'invoice_number', 'total', 'status', 'due_date', 'created_at')
             ->latest()
             ->limit(5)
