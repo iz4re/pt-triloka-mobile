@@ -9,6 +9,7 @@ import 'profile_screen.dart';
 import 'invoice_list_screen.dart';
 import 'project_request_list_screen.dart';
 import 'quotation_list_screen.dart';
+import 'contact_us_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -690,11 +691,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Center(
       child: ElevatedButton.icon(
         onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Hubungi admin untuk bantuan lebih lanjut'),
-              duration: Duration(seconds: 2),
-            ),
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ContactUsScreen()),
           );
         },
         icon: const Icon(Icons.help_outline),
