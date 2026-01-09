@@ -108,9 +108,9 @@ flutter pub get            # Install packages
 ---
 
 ## Team
-Ahmad Naufal Alghiffari
-Yudha Harwanto
-abizar
+Ahmad Naufal Alghiffari,
+Yudha Harwanto,
+abizar,
 Hafidz
 
 
