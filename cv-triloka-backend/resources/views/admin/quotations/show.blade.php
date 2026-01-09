@@ -141,6 +141,74 @@
                     </table>
                 </div>
             </div>
+
+            {{-- Negotiation Section --}}
+            @if($quotation->negotiations->isNotEmpty())
+                <div class="bg-white rounded-lg shadow">
+                    <div class="px-6 py-4 border-b bg-purple-600">
+                        <h3 class="text-lg font-semibold text-white">💬 Negotiation Requests</h3>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        @foreach($quotation->negotiations as $negotiation)
+                            <div class="border rounded-lg p-4 {{ $negotiation->status === 'pending' ? 'border-yellow-300 bg-yellow-50' : 'border-gray-200' }}">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div>
+                                        <p class="text-sm text-gray-600">From: <span class="font-semibold text-gray-900">{{ $negotiation->sender->name }}</span></p>
+                                        <p class="text-xs text-gray-500">{{ $negotiation->created_at->format('d M Y H:i') }}</p>
+                                    </div>
+                                    @if($negotiation->status === 'pending')
+                                        <span class="px-2 py-1 text-xs font-semibold rounded bg-yellow-100 text-yellow-800">⏳ Pending</span>
+                                    @elseif($negotiation->status === 'accepted')
+                                        <span class="px-2 py-1 text-xs font-semibold rounded bg-green-100 text-green-800">✅ Accepted</span>
+                                    @else
+                                        <span class="px-2 py-1 text-xs font-semibold rounded bg-red-100 text-red-800">❌ Rejected</span>
+                                    @endif
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-4 mb-3">
+                                    <div>
+                                        <p class="text-xs text-gray-600">Original Price:</p>
+                                        <p class="font-semibold text-gray-900">Rp {{ number_format($quotation->total, 0, ',', '.') }}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-gray-600">Counter Offer:</p>
+                                        <p class="font-bold text-blue-600">Rp {{ number_format($negotiation->counter_amount, 0, ',', '.') }}</p>
+                                        <p class="text-xs text-gray-500">
+                                            ({{ number_format((($negotiation->counter_amount - $quotation->total) / $quotation->total) * 100, 1) }}%)
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <p class="text-xs text-gray-600 mb-1">Message:</p>
+                                    <p class="text-sm text-gray-800 italic bg-gray-50 p-2 rounded">"{{ $negotiation->message }}"</p>
+                                </div>
+                                
+                                @if($negotiation->status === 'pending')
+                                    <div class="flex gap-2 mt-3 pt-3 border-t">
+                                        <form method="POST" action="{{ route('admin.negotiations.accept', $negotiation->id) }}" class="flex-1">
+                                            @csrf
+                                            <button type="submit" 
+                                                    class="w-full px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition font-semibold"
+                                                    onclick="return confirm('Accept this negotiation?\nQuotation will be updated to Rp {{ number_format($negotiation->counter_amount, 0, ',', '.') }}')">
+                                                ✅ Accept & Update Quotation
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="{{ route('admin.negotiations.reject', $negotiation->id) }}" class="flex-1">
+                                            @csrf
+                                            <button type="submit" 
+                                                    class="w-full px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition font-semibold"
+                                                    onclick="return confirm('Reject this negotiation?')">
+                                                ❌ Reject
+                                            </button>
+                                        </form>
+                                    </div>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
         </div>
 
         <!-- Sidebar - 1 column -->

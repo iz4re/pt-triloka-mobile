@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/quotation.dart';
 import '../services/api_service.dart';
 import '../utils/error_handler.dart';
+import '../widgets/negotiation_bottom_sheet.dart';
 import 'package:intl/intl.dart';
 
 class QuotationDetailScreen extends StatefulWidget {
@@ -456,48 +457,82 @@ class _QuotationDetailScreenState extends State<QuotationDetailScreen> {
   }
 
   Widget _buildActionButtons() {
-    return Row(
+    return Column(
       children: [
-        Expanded(
-          child: OutlinedButton(
-            onPressed: _isProcessing ? null : _rejectQuotation,
+        // Negotiate Button
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: _isProcessing
+                ? null
+                : () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) => Padding(
+                        padding: EdgeInsets.only(
+                          bottom: MediaQuery.of(context).viewInsets.bottom,
+                        ),
+                        child: NegotiationBottomSheet(quotation: _quotation!),
+                      ),
+                    );
+                  },
+            icon: const Icon(Icons.chat_bubble_outline),
+            label: const Text('Negosiasi Harga'),
             style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.red,
-              side: const BorderSide(color: Colors.red),
+              foregroundColor: const Color(0xFF6C5DD3),
+              side: const BorderSide(color: Color(0xFF6C5DD3)),
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
-            child: _isProcessing
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text('Tolak'),
           ),
         ),
-        const SizedBox(width: 12),
-        Expanded(
-          flex: 2,
-          child: ElevatedButton(
-            onPressed: _isProcessing ? null : _approveQuotation,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              padding: const EdgeInsets.symmetric(vertical: 16),
+        const SizedBox(height: 12),
+        // Approve & Reject Row
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                onPressed: _isProcessing ? null : _rejectQuotation,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.red,
+                  side: const BorderSide(color: Colors.red),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                child: _isProcessing
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Text('Tolak'),
+              ),
             ),
-            child: _isProcessing
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                : const Text(
-                    'Setujui Quotation',
-                    style: TextStyle(color: Colors.white),
-                  ),
-          ),
+            const SizedBox(width: 12),
+            Expanded(
+              flex: 2,
+              child: ElevatedButton(
+                onPressed: _isProcessing ? null : _approveQuotation,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                child: _isProcessing
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Text(
+                        'Setujui Quotation',
+                        style: TextStyle(color: Colors.white),
+                      ),
+              ),
+            ),
+          ],
         ),
       ],
     );

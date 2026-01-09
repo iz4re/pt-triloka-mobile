@@ -28,25 +28,39 @@ class NegotiationController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'quotation_id' => 'required|integer',
-            'message' => 'required|string',
-            'counter_amount' => 'nullable|numeric'
-        ]);
+        try {
+            $validated = $request->validate([
+                'quotation_id' => 'required|integer|exists:quotations,id',
+                'message' => 'required|string|min:10',
+                'counter_amount' => 'required|numeric|min:1'
+            ]);
 
-        $negotiation = Negotiation::create([
-            'quotation_id' => $request->quotation_id,
-            'sender_id' => $request->user()->id,
-            'sender_type' => $request->user()->role,
-            'message' => $request->message,
-            'counter_amount' => $request->counter_amount,
-            'status' => 'pending'
-        ]);
+            $negotiation = Negotiation::create([
+                'quotation_id' => $validated['quotation_id'],
+                'sender_id' => $request->user()->id,
+                'sender_type' => $request->user()->role,
+                'message' => $validated['message'],
+                'counter_amount' => $validated['counter_amount'],
+                'status' => 'pending'
+            ]);
 
-        return response()->json([
-            'success' => true,
-            'data' => $negotiation
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Negotiation created successfully',
+                'data' => $negotiation
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation error',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Server error: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function updateStatus(Request $request, $id)

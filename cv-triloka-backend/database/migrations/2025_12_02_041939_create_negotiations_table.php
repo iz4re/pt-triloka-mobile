@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('quotation_id')->constrained('quotations')->onDelete('cascade');
             $table->foreignId('sender_id')->constrained('users')->onDelete('cascade');
-            $table->enum('sender_type', ['client', 'admin'])->default('client');
+            $table->enum('sender_type', ['klien', 'admin'])->default('klien');
             $table->text('message');
             $table->decimal('counter_amount', 15, 2)->nullable();
             $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending');

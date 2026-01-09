@@ -57,6 +57,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::delete('quotations/{id}', [App\Http\Controllers\Admin\QuotationController::class, 'destroy'])->name('quotations.destroy');
             Route::post('quotations/{id}/create-invoice', [App\Http\Controllers\Admin\InvoiceController::class, 'createFromQuotation'])->name('quotations.createInvoice');
             
+            // Negotiations
+            Route::get('negotiations', [App\Http\Controllers\Admin\NegotiationController::class, 'index'])->name('negotiations.index');
+            Route::post('negotiations/{id}/accept', [App\Http\Controllers\Admin\NegotiationController::class, 'accept'])->name('negotiations.accept');
+            Route::post('negotiations/{id}/reject', [App\Http\Controllers\Admin\NegotiationController::class, 'reject'])->name('negotiations.reject');
+            
             // Exports
             Route::get('export/invoice/{id}/print', [App\Http\Controllers\Admin\ExportController::class, 'invoicePrint'])->name('export.invoice.print');
             Route::get('export/requests/csv', [App\Http\Controllers\Admin\ExportController::class, 'requestsCSV'])->name('export.requests.csv');

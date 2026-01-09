@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'screens/login_screen.dart';
 import 'screens/payment_upload_screen.dart';
+import 'screens/negotiation_screen.dart';
 import 'models/invoice.dart';
 
 void main() {
@@ -40,6 +41,12 @@ class MyApp extends StatelessWidget {
           final invoice = settings.arguments as Invoice;
           return MaterialPageRoute(
             builder: (context) => PaymentUploadScreen(invoice: invoice),
+          );
+        }
+        if (settings.name == '/negotiation') {
+          final quotationId = settings.arguments as int;
+          return MaterialPageRoute(
+            builder: (context) => NegotiationScreen(quotationId: quotationId),
           );
         }
         return null;

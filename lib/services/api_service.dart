@@ -525,4 +525,24 @@ class ApiService {
       rethrow;
     }
   }
+
+  Future<Map<String, dynamic>> createNegotiation({
+    required int quotationId,
+    required double counterAmount,
+    required String message,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '/negotiations',
+        data: {
+          'quotation_id': quotationId,
+          'counter_amount': counterAmount,
+          'message': message,
+        },
+      );
+      return response.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }
