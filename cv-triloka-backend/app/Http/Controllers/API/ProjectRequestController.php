@@ -57,7 +57,7 @@ class ProjectRequestController extends Controller
 
         $projectRequest = ProjectRequest::create([
             'user_id' => $request->user()->id,
-            'klien_id' => $request->user()->id,  
+            // 'klien_id' => $request->user()->id,  
             'title' => $request->title,
             'type' => $request->type,
             'description' => $request->description,

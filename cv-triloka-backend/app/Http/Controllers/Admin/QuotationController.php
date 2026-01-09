@@ -76,7 +76,7 @@ class QuotationController extends Controller
         // Create quotation
         $quotation = Quotation::create([
             'project_request_id' => $validated['project_request_id'],
-            'quotation_date' => now()->toDateString(),
+            // 'quotation_date' => now()->toDateString(),
             'tax' => $validated['tax'] ?? 0,
             'discount' => $validated['discount'] ?? 0,
             'notes' => $validated['notes'],
