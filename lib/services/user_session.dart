@@ -52,8 +52,12 @@ class UserSession {
   }
 
   // Set user from JSON data (for API responses)
-  Future<void> setUserFromJson(Map<String, dynamic> json) async {
-    final user = User.fromMap(json);
-    await setUser(user);
+  Future<void> setUserFromJson(dynamic json) async {
+    if (json is Map<String, dynamic>) {
+      final user = User.fromMap(json);
+      await setUser(user);
+    } else {
+      print('ERR: setUserFromJson received invalid data: $json');
+    }
   }
 }
