@@ -14,6 +14,9 @@ class RequestDocument extends Model
         'project_request_id',  // Fixed: was request_id
         'document_type',
         'file_path',
+        'file_name',
+        'file_type',
+        'file_size',
         'description',
         'verification_status',
         'verification_notes',

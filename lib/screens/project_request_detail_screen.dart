@@ -106,6 +106,7 @@ class _ProjectRequestDetailScreenState
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx'],
+        withData: true,
       );
 
       debugPrint('DEBUG: File picker result: ${result != null}');

@@ -1,0 +1,157 @@
+### Variables
+@baseUrl = http://127.0.0.1:8000/api
+@token = your_token_here
+
+### ============================================
+### PUBLIC ENDPOINTS (No Token Required)
+### ============================================
+
+### 1. Register New User
+POST {{baseUrl}}/register
+Content-Type: application/json
+
+{
+    "name": "Test User",
+    "email": "testuser@example.com",
+    "password": "password123",
+    "password_confirmation": "password123",
+    "phone": "081234567890",
+    "company_name": "Test Company"
+}
+
+### 2. Login - COPY TOKEN from response!
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+    "email": "testuser@example.com",
+    "password": "password123"
+}
+
+### ============================================
+### PROTECTED ENDPOINTS (Need Token)
+### ============================================
+### NOTE: Replace @token value above with token from login response!
+
+### 3. Get Current User Profile
+GET {{baseUrl}}/user
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### 4. Update Profile
+PUT {{baseUrl}}/user/profile
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "name": "Updated Name",
+    "phone": "081234567890",
+    "company_name": "Updated Company"
+}
+
+### 5. Dashboard Summary
+GET {{baseUrl}}/dashboard/summary
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### 6. Get All Invoices
+GET {{baseUrl}}/invoices
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### 7. Get Invoice Detail (change ID as needed)
+GET {{baseUrl}}/invoices/1
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### 8. Get All Payments
+GET {{baseUrl}}/payments
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### 9. Get Payment Detail (change ID as needed)
+GET {{baseUrl}}/payments/1
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### 10. Get All Quotations
+GET {{baseUrl}}/quotations
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### 11. Get Quotation Detail (change ID as needed)
+GET {{baseUrl}}/quotations/1
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### 12. Approve Quotation
+POST {{baseUrl}}/quotations/1/approve
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### 13. Reject Quotation
+POST {{baseUrl}}/quotations/1/reject
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "rejection_reason": "Harga terlalu mahal"
+}
+
+### 14. Get All Items
+GET {{baseUrl}}/items
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### 15. Get Low Stock Items
+GET {{baseUrl}}/items/status/low-stock
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### 16. Get All Notifications
+GET {{baseUrl}}/notifications
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### 17. Mark Notification as Read
+PUT {{baseUrl}}/notifications/1/read
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### 18. Mark All Notifications as Read
+PUT {{baseUrl}}/notifications/read-all
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### 19. Get All Project Requests
+GET {{baseUrl}}/project-requests
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### 20. Get Project Request Detail
+GET {{baseUrl}}/project-requests/1
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### 21. Create New Project Request
+POST {{baseUrl}}/project-requests
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "title": "Website Development",
+    "description": "Need a corporate website",
+    "type": "web_development",
+    "budget": 50000000,
+    "deadline": "2026-02-28"
+}
+
+### 22. Debug Quotations (Troubleshooting)
+GET {{baseUrl}}/debug/quotations
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### 23. Logout
+POST {{baseUrl}}/logout
+Authorization: Bearer {{token}}
+Accept: application/json

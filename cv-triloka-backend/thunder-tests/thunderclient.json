@@ -1,0 +1,589 @@
+{
+  "client": "Thunder Client",
+  "collectionName": "PT Triloka API",
+  "dateExported": "2026-01-09T12:17:00.000Z",
+  "version": "1.1",
+  "folders": [
+    {
+      "id": "auth-folder",
+      "name": "Authentication",
+      "containerId": "",
+      "created": "2026-01-09T12:17:00.000Z",
+      "sortNum": 10000
+    },
+    {
+      "id": "dashboard-folder",
+      "name": "Dashboard",
+      "containerId": "",
+      "created": "2026-01-09T12:17:00.000Z",
+      "sortNum": 20000
+    },
+    {
+      "id": "invoices-folder",
+      "name": "Invoices",
+      "containerId": "",
+      "created": "2026-01-09T12:17:00.000Z",
+      "sortNum": 30000
+    },
+    {
+      "id": "payments-folder",
+      "name": "Payments",
+      "containerId": "",
+      "created": "2026-01-09T12:17:00.000Z",
+      "sortNum": 40000
+    },
+    {
+      "id": "quotations-folder",
+      "name": "Quotations",
+      "containerId": "",
+      "created": "2026-01-09T12:17:00.000Z",
+      "sortNum": 50000
+    },
+    {
+      "id": "items-folder",
+      "name": "Items",
+      "containerId": "",
+      "created": "2026-01-09T12:17:00.000Z",
+      "sortNum": 60000
+    },
+    {
+      "id": "notifications-folder",
+      "name": "Notifications",
+      "containerId": "",
+      "created": "2026-01-09T12:17:00.000Z",
+      "sortNum": 70000
+    },
+    {
+      "id": "projects-folder",
+      "name": "Project Requests",
+      "containerId": "",
+      "created": "2026-01-09T12:17:00.000Z",
+      "sortNum": 80000
+    }
+  ],
+  "requests": [
+    {
+      "id": "register-request",
+      "name": "Register",
+      "url": "http://127.0.0.1:8000/api/register",
+      "method": "POST",
+      "sortNum": 10000,
+      "created": "2026-01-09T12:17:00.000Z",
+      "modified": "2026-01-09T12:17:00.000Z",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n    \"name\": \"Test User\",\n    \"email\": \"testuser@example.com\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\",\n    \"phone\": \"081234567890\",\n    \"company_name\": \"Test Company\"\n}",
+        "form": []
+      },
+      "tests": [],
+      "containerId": "auth-folder"
+    },
+    {
+      "id": "login-request",
+      "name": "Login (Copy Token!)",
+      "url": "http://127.0.0.1:8000/api/login",
+      "method": "POST",
+      "sortNum": 20000,
+      "created": "2026-01-09T12:17:00.000Z",
+      "modified": "2026-01-09T12:17:00.000Z",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n    \"email\": \"testuser@example.com\",\n    \"password\": \"password123\"\n}",
+        "form": []
+      },
+      "tests": [],
+      "containerId": "auth-folder"
+    },
+    {
+      "id": "get-user-request",
+      "name": "Get User Profile",
+      "url": "http://127.0.0.1:8000/api/user",
+      "method": "GET",
+      "sortNum": 30000,
+      "created": "2026-01-09T12:17:00.000Z",
+      "modified": "2026-01-09T12:17:00.000Z",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer YOUR_TOKEN_HERE"
+        },
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "tests": [],
+      "containerId": "auth-folder"
+    },
+    {
+      "id": "update-profile-request",
+      "name": "Update Profile",
+      "url": "http://127.0.0.1:8000/api/user/profile",
+      "method": "PUT",
+      "sortNum": 40000,
+      "created": "2026-01-09T12:17:00.000Z",
+      "modified": "2026-01-09T12:17:00.000Z",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer YOUR_TOKEN_HERE"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n    \"name\": \"Updated Name\",\n    \"phone\": \"081234567890\",\n    \"company_name\": \"Updated Company\"\n}",
+        "form": []
+      },
+      "tests": [],
+      "containerId": "auth-folder"
+    },
+    {
+      "id": "logout-request",
+      "name": "Logout",
+      "url": "http://127.0.0.1:8000/api/logout",
+      "method": "POST",
+      "sortNum": 50000,
+      "created": "2026-01-09T12:17:00.000Z",
+      "modified": "2026-01-09T12:17:00.000Z",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer YOUR_TOKEN_HERE"
+        },
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "tests": [],
+      "containerId": "auth-folder"
+    },
+    {
+      "id": "dashboard-summary-request",
+      "name": "Dashboard Summary",
+      "url": "http://127.0.0.1:8000/api/dashboard/summary",
+      "method": "GET",
+      "sortNum": 10000,
+      "created": "2026-01-09T12:17:00.000Z",
+      "modified": "2026-01-09T12:17:00.000Z",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer YOUR_TOKEN_HERE"
+        },
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "tests": [],
+      "containerId": "dashboard-folder"
+    },
+    {
+      "id": "get-invoices-request",
+      "name": "Get All Invoices",
+      "url": "http://127.0.0.1:8000/api/invoices",
+      "method": "GET",
+      "sortNum": 10000,
+      "created": "2026-01-09T12:17:00.000Z",
+      "modified": "2026-01-09T12:17:00.000Z",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer YOUR_TOKEN_HERE"
+        },
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "tests": [],
+      "containerId": "invoices-folder"
+    },
+    {
+      "id": "get-invoice-detail-request",
+      "name": "Get Invoice Detail",
+      "url": "http://127.0.0.1:8000/api/invoices/1",
+      "method": "GET",
+      "sortNum": 20000,
+      "created": "2026-01-09T12:17:00.000Z",
+      "modified": "2026-01-09T12:17:00.000Z",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer YOUR_TOKEN_HERE"
+        },
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "tests": [],
+      "containerId": "invoices-folder"
+    },
+    {
+      "id": "get-payments-request",
+      "name": "Get All Payments",
+      "url": "http://127.0.0.1:8000/api/payments",
+      "method": "GET",
+      "sortNum": 10000,
+      "created": "2026-01-09T12:17:00.000Z",
+      "modified": "2026-01-09T12:17:00.000Z",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer YOUR_TOKEN_HERE"
+        },
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "tests": [],
+      "containerId": "payments-folder"
+    },
+    {
+      "id": "get-payment-detail-request",
+      "name": "Get Payment Detail",
+      "url": "http://127.0.0.1:8000/api/payments/1",
+      "method": "GET",
+      "sortNum": 20000,
+      "created": "2026-01-09T12:17:00.000Z",
+      "modified": "2026-01-09T12:17:00.000Z",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer YOUR_TOKEN_HERE"
+        },
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "tests": [],
+      "containerId": "payments-folder"
+    },
+    {
+      "id": "get-quotations-request",
+      "name": "Get All Quotations",
+      "url": "http://127.0.0.1:8000/api/quotations",
+      "method": "GET",
+      "sortNum": 10000,
+      "created": "2026-01-09T12:17:00.000Z",
+      "modified": "2026-01-09T12:17:00.000Z",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer YOUR_TOKEN_HERE"
+        },
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "tests": [],
+      "containerId": "quotations-folder"
+    },
+    {
+      "id": "get-quotation-detail-request",
+      "name": "Get Quotation Detail",
+      "url": "http://127.0.0.1:8000/api/quotations/1",
+      "method": "GET",
+      "sortNum": 20000,
+      "created": "2026-01-09T12:17:00.000Z",
+      "modified": "2026-01-09T12:17:00.000Z",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer YOUR_TOKEN_HERE"
+        },
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "tests": [],
+      "containerId": "quotations-folder"
+    },
+    {
+      "id": "approve-quotation-request",
+      "name": "Approve Quotation",
+      "url": "http://127.0.0.1:8000/api/quotations/1/approve",
+      "method": "POST",
+      "sortNum": 30000,
+      "created": "2026-01-09T12:17:00.000Z",
+      "modified": "2026-01-09T12:17:00.000Z",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer YOUR_TOKEN_HERE"
+        },
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "tests": [],
+      "containerId": "quotations-folder"
+    },
+    {
+      "id": "reject-quotation-request",
+      "name": "Reject Quotation",
+      "url": "http://127.0.0.1:8000/api/quotations/1/reject",
+      "method": "POST",
+      "sortNum": 40000,
+      "created": "2026-01-09T12:17:00.000Z",
+      "modified": "2026-01-09T12:17:00.000Z",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer YOUR_TOKEN_HERE"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n    \"rejection_reason\": \"Harga terlalu mahal\"\n}",
+        "form": []
+      },
+      "tests": [],
+      "containerId": "quotations-folder"
+    },
+    {
+      "id": "debug-quotations-request",
+      "name": "Debug Quotations",
+      "url": "http://127.0.0.1:8000/api/debug/quotations",
+      "method": "GET",
+      "sortNum": 50000,
+      "created": "2026-01-09T12:17:00.000Z",
+      "modified": "2026-01-09T12:17:00.000Z",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer YOUR_TOKEN_HERE"
+        },
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "tests": [],
+      "containerId": "quotations-folder"
+    },
+    {
+      "id": "get-items-request",
+      "name": "Get All Items",
+      "url": "http://127.0.0.1:8000/api/items",
+      "method": "GET",
+      "sortNum": 10000,
+      "created": "2026-01-09T12:17:00.000Z",
+      "modified": "2026-01-09T12:17:00.000Z",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer YOUR_TOKEN_HERE"
+        },
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "tests": [],
+      "containerId": "items-folder"
+    },
+    {
+      "id": "get-low-stock-request",
+      "name": "Get Low Stock Items",
+      "url": "http://127.0.0.1:8000/api/items/status/low-stock",
+      "method": "GET",
+      "sortNum": 20000,
+      "created": "2026-01-09T12:17:00.000Z",
+      "modified": "2026-01-09T12:17:00.000Z",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer YOUR_TOKEN_HERE"
+        },
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "tests": [],
+      "containerId": "items-folder"
+    },
+    {
+      "id": "get-notifications-request",
+      "name": "Get All Notifications",
+      "url": "http://127.0.0.1:8000/api/notifications",
+      "method": "GET",
+      "sortNum": 10000,
+      "created": "2026-01-09T12:17:00.000Z",
+      "modified": "2026-01-09T12:17:00.000Z",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer YOUR_TOKEN_HERE"
+        },
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "tests": [],
+      "containerId": "notifications-folder"
+    },
+    {
+      "id": "mark-as-read-request",
+      "name": "Mark Notification as Read",
+      "url": "http://127.0.0.1:8000/api/notifications/1/read",
+      "method": "PUT",
+      "sortNum": 20000,
+      "created": "2026-01-09T12:17:00.000Z",
+      "modified": "2026-01-09T12:17:00.000Z",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer YOUR_TOKEN_HERE"
+        },
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "tests": [],
+      "containerId": "notifications-folder"
+    },
+    {
+      "id": "mark-all-read-request",
+      "name": "Mark All as Read",
+      "url": "http://127.0.0.1:8000/api/notifications/read-all",
+      "method": "PUT",
+      "sortNum": 30000,
+      "created": "2026-01-09T12:17:00.000Z",
+      "modified": "2026-01-09T12:17:00.000Z",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer YOUR_TOKEN_HERE"
+        },
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "tests": [],
+      "containerId": "notifications-folder"
+    },
+    {
+      "id": "get-project-requests-request",
+      "name": "Get All Project Requests",
+      "url": "http://127.0.0.1:8000/api/project-requests",
+      "method": "GET",
+      "sortNum": 10000,
+      "created": "2026-01-09T12:17:00.000Z",
+      "modified": "2026-01-09T12:17:00.000Z",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer YOUR_TOKEN_HERE"
+        },
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "tests": [],
+      "containerId": "projects-folder"
+    },
+    {
+      "id": "get-project-detail-request",
+      "name": "Get Project Request Detail",
+      "url": "http://127.0.0.1:8000/api/project-requests/1",
+      "method": "GET",
+      "sortNum": 20000,
+      "created": "2026-01-09T12:17:00.000Z",
+      "modified": "2026-01-09T12:17:00.000Z",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer YOUR_TOKEN_HERE"
+        },
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "tests": [],
+      "containerId": "projects-folder"
+    },
+    {
+      "id": "create-project-request",
+      "name": "Create Project Request",
+      "url": "http://127.0.0.1:8000/api/project-requests",
+      "method": "POST",
+      "sortNum": 30000,
+      "created": "2026-01-09T12:17:00.000Z",
+      "modified": "2026-01-09T12:17:00.000Z",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer YOUR_TOKEN_HERE"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n    \"title\": \"Website Development\",\n    \"description\": \"Need a corporate website\",\n    \"type\": \"web_development\",\n    \"budget\": 50000000,\n    \"deadline\": \"2026-02-28\"\n}",
+        "form": []
+      },
+      "tests": [],
+      "containerId": "projects-folder"
+    }
+  ]
+}

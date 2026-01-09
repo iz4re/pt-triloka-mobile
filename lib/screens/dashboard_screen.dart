@@ -337,12 +337,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
               style: TextStyle(color: Colors.white70, fontSize: 12),
             ),
             const SizedBox(height: 16),
-            ElevatedButton(
+            ElevatedButton.icon(
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const ProfileScreen(),
+                    builder: (context) => const ProjectRequestListScreen(),
                   ),
                 );
               },
@@ -357,8 +357,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   vertical: 12,
                 ),
               ),
-              child: const Text(
-                'Lihat Profil Saya',
+              icon: const Icon(Icons.add_circle_outline, size: 20),
+              label: const Text(
+                'Ajukan Project Baru',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),

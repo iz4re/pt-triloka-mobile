@@ -69,7 +69,7 @@ class InvoiceController extends Controller
         
         // Create invoice
         $invoice = Invoice::create([
-            'klien_id' => $quotation->projectRequest->klien_id ?? $quotation->projectRequest->user_id,
+            'klien_id' => $quotation->projectRequest->user_id,
             'quotation_id' => $quotation->id,
             'invoice_type' => 'project',
             'invoice_date' => now(),

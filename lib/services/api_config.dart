@@ -1,30 +1,22 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class ApiConfig {
-  // Auto-detect platform and use appropriate URL
-  // Web (Chrome): 127.0.0.1
-  // Android Emulator: 10.0.2.2
-  // Production: Change to your actual server domain
   static String get baseUrl {
     if (kIsWeb) {
       return 'http://127.0.0.1:8000/api';
     } else {
-      // Android emulator or real device
       return 'http://10.0.2.2:8000/api';
     }
   }
 
-  // API Endpoints
   static const String login = '/login';
   static const String register = '/register';
   static const String logout = '/logout';
   static const String user = '/user';
   static const String updateProfile = '/user/profile';
 
-  // Dashboard
   static const String dashboardSummary = '/dashboard/summary';
 
-  // Invoices
   static const String invoices = '/invoices';
   static String invoiceDetail(int id) => '/invoices/$id';
 

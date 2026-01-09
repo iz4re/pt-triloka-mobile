@@ -46,16 +46,17 @@ class _LoginScreenState extends State<LoginScreen> {
         await UserSession().setUser(result.user!);
       }
 
-      // Navigate to dashboard
       if (mounted) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const DashboardScreen()),
         );
       }
     } else {
-      // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result.message), backgroundColor: Colors.red),
+        SnackBar(
+          content: Text('Email atau password salah. Silakan coba lagi!'),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }

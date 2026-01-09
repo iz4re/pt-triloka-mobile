@@ -65,13 +65,13 @@ class AuthController extends Controller
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
+                'email' => ['Email atau password salah. Silakan coba lagi.'],
             ]);
         }
 
         if (!$user->is_active) {
             throw ValidationException::withMessages([
-                'email' => ['Your account has been deactivated.'],
+                'email' => ['Akun Anda telah dinonaktifkan. Hubungi admin.'],
             ]);
         }
 

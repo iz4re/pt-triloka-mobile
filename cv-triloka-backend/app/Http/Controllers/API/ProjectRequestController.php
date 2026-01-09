@@ -17,7 +17,7 @@ class ProjectRequestController extends Controller
     public function index(Request $request)
     {
         $query = ProjectRequest::where('user_id', $request->user()->id)
-            ->with(['klien', 'documents'])  // Re-enabled after table creation
+            ->with(['klien', 'documents']) 
             ->orderBy('created_at', 'desc');
 
         // Filter by status if provided
@@ -57,7 +57,7 @@ class ProjectRequestController extends Controller
 
         $projectRequest = ProjectRequest::create([
             'user_id' => $request->user()->id,
-            // 'klien_id' => $request->user()->id,  // Add this - same as user_id for clients
+            'klien_id' => $request->user()->id,  
             'title' => $request->title,
             'type' => $request->type,
             'description' => $request->description,
@@ -68,7 +68,7 @@ class ProjectRequestController extends Controller
         ]);
 
         // Load relationships
-        $projectRequest->load(['klien', 'documents']);  // Re-enabled after table creation
+        $projectRequest->load(['klien', 'documents']); 
 
         return response()->json([
             'success' => true,
@@ -82,7 +82,7 @@ class ProjectRequestController extends Controller
      */
     public function show(Request $request, $id)
     {
-        $projectRequest = ProjectRequest::with(['klien', 'documents'])  // Removed quotations temporarily
+        $projectRequest = ProjectRequest::with(['klien', 'documents']) 
             ->find($id);
 
         if (!$projectRequest) {

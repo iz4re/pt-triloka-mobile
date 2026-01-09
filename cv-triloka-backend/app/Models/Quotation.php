@@ -51,7 +51,6 @@ class Quotation extends Model
         });
     }
 
-    // Relationships
     public function projectRequest()
     {
         return $this->belongsTo(ProjectRequest::class, 'project_request_id');  
@@ -72,7 +71,6 @@ class Quotation extends Model
         return $this->hasMany(Negotiation::class, 'quotation_id');
     }
 
-    // Helper methods
     public function calculateTotal()
     {
         $this->subtotal = $this->items()->sum('subtotal');
