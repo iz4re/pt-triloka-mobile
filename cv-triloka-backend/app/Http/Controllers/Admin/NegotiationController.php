@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Negotiation;
 use App\Models\Quotation;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 
 class NegotiationController extends Controller
@@ -39,7 +40,7 @@ class NegotiationController extends Controller
     /**
      * Accept negotiation and create revised quotation
      */
-    public function accept($id)
+    public function accept(Request $request, $id)
     {
         $negotiation = Negotiation::with('quotation')->findOrFail($id);
 
@@ -48,7 +49,10 @@ class NegotiationController extends Controller
         }
 
         // Update negotiation status
-        $negotiation->update(['status' => 'accepted']);
+        $negotiation->update([
+            'status' => 'accepted',
+            'admin_notes' => $request->admin_notes
+        ]);
 
         // Update quotation with counter amount and status
         $negotiation->quotation->update([
@@ -57,6 +61,19 @@ class NegotiationController extends Controller
             'status' => 'revised',
             'version' => $negotiation->quotation->version + 1,
         ]);
+        
+        $negotiation->load('quotation.projectRequest.klien');
+        $client = $negotiation->quotation->projectRequest->klien;
+        
+        if ($client) {
+            Notification::createFor(
+                $client,
+                'negotiation_accepted',
+                'Negosiasi Disetujui',
+                "Penawaran harga Anda untuk {$negotiation->quotation->quotation_number} telah disetujui admin.",
+                $negotiation
+            );
+        }
 
         return back()->with('success', 'Negotiation accepted and quotation updated!');
     }
@@ -64,7 +81,7 @@ class NegotiationController extends Controller
     /**
      * Reject negotiation
      */
-    public function reject($id)
+    public function reject(Request $request, $id)
     {
         $negotiation = Negotiation::findOrFail($id);
 
@@ -73,7 +90,23 @@ class NegotiationController extends Controller
         }
 
         // Update negotiation status
-        $negotiation->update(['status' => 'rejected']);
+        $negotiation->update([
+            'status' => 'rejected',
+            'admin_notes' => $request->admin_notes
+        ]);
+        
+        $negotiation->load('quotation.projectRequest.klien');
+        $client = $negotiation->quotation->projectRequest->klien;
+        
+        if ($client) {
+            Notification::createFor(
+                $client,
+                'negotiation_rejected',
+                'Negosiasi Ditolak',
+                "Penawaran harga Anda untuk {$negotiation->quotation->quotation_number} ditolak oleh admin.",
+                $negotiation
+            );
+        }
 
         return back()->with('success', 'Negotiation rejected');
     }

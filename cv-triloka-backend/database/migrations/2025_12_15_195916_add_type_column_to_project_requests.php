@@ -18,11 +18,6 @@ return new class extends Migration
                       ->default('other')
                       ->after('title');
             }
-            
-            // Rename klien_id to user_id if needed
-            if (Schema::hasColumn('project_requests', 'klien_id') && !Schema::hasColumn('project_requests', 'user_id')) {
-                $table->renameColumn('klien_id', 'user_id');
-            }
         });
     }
 

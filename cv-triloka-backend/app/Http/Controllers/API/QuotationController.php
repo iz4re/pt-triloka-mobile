@@ -23,7 +23,7 @@ class QuotationController extends Controller
         // Query quotations - check BOTH user_id AND klien_id for compatibility
         // Query quotations
         $query = Quotation::whereHas('projectRequest', function ($q) use ($userId) {
-            $q->where('user_id', $userId); // Cukup cek user_id aja
+            $q->where('klien_id', $userId);
         })->with(['projectRequest', 'items']);
 
         // Filter by status if provided
@@ -47,7 +47,7 @@ class QuotationController extends Controller
      */
     public function show(Request $request, $id)
     {
-        $quotation = Quotation::with(['projectRequest', 'items'])->find($id);
+        $quotation = Quotation::with(['projectRequest', 'items', 'negotiations.sender'])->find($id);
 
         if (!$quotation) {
             return response()->json([
@@ -59,8 +59,7 @@ class QuotationController extends Controller
         $userId = $request->user()->id;
 
         // Check authorization - check both user_id and klien_id
-        // Check authorization
-        $isAuthorized = $quotation->projectRequest->user_id == $userId;
+        $isAuthorized = $quotation->projectRequest->klien_id == $userId;
 
         if (!$isAuthorized) {
             return response()->json([
@@ -92,8 +91,7 @@ class QuotationController extends Controller
         $userId = $request->user()->id;
 
         // Check authorization
-        // Check authorization
-        $isAuthorized = $quotation->projectRequest->user_id == $userId;
+        $isAuthorized = $quotation->projectRequest->klien_id == $userId;
 
         if (!$isAuthorized) {
             return response()->json([
@@ -148,8 +146,7 @@ class QuotationController extends Controller
         $userId = $request->user()->id;
 
         // Check authorization
-        // Check authorization
-        $isAuthorized = $quotation->projectRequest->user_id == $userId;
+        $isAuthorized = $quotation->projectRequest->klien_id == $userId;
 
         if (!$isAuthorized) {
             return response()->json([

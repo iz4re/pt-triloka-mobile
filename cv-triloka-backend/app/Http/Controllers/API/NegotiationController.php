@@ -4,6 +4,9 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Negotiation;
+use App\Models\Notification;
+use App\Models\User;
+use App\Models\Quotation;
 use Illuminate\Http\Request;
 
 class NegotiationController extends Controller
@@ -43,6 +46,20 @@ class NegotiationController extends Controller
                 'counter_amount' => $validated['counter_amount'],
                 'status' => 'pending'
             ]);
+
+            // Notify all admins
+            $admins = User::where('role', 'admin')->get();
+            $quotation = Quotation::find($validated['quotation_id']);
+            
+            foreach ($admins as $admin) {
+                Notification::createFor(
+                    $admin,
+                    'new_negotiation',
+                    'Negosiasi Baru Diajukan',
+                    "Klien {$request->user()->name} mengajukan penawaran harga baru untuk {$quotation->quotation_number}",
+                    $negotiation
+                );
+            }
 
             return response()->json([
                 'success' => true,

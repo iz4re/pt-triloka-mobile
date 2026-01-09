@@ -49,6 +49,57 @@ class QuotationItem {
   }
 }
 
+class Negotiation {
+  final int id;
+  final int quotationId;
+  final int senderId;
+  final String senderType;
+  final String message;
+  final double counterAmount;
+  final String status;
+  final String? adminNotes;
+  final String createdAt;
+
+  Negotiation({
+    required this.id,
+    required this.quotationId,
+    required this.senderId,
+    required this.senderType,
+    required this.message,
+    required this.counterAmount,
+    required this.status,
+    this.adminNotes,
+    required this.createdAt,
+  });
+
+  factory Negotiation.fromJson(Map<String, dynamic> json) {
+    return Negotiation(
+      id: json['id'] ?? 0,
+      quotationId: json['quotation_id'] ?? 0,
+      senderId: json['sender_id'] ?? 0,
+      senderType: json['sender_type'] ?? '',
+      message: json['message'] ?? '',
+      counterAmount: double.tryParse(json['counter_amount'].toString()) ?? 0,
+      status: json['status'] ?? 'pending',
+      adminNotes: json['admin_notes'],
+      createdAt: json['created_at'] ?? '',
+    );
+  }
+
+  String getStatusLabel() {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return 'Menunggu';
+      case 'accepted':
+        return 'Disetujui';
+      case 'rejected':
+        return 'Ditolak';
+      default:
+        return status;
+    }
+  }
+}
+
 class Quotation {
   final int id;
   final int projectRequestId;
@@ -63,6 +114,7 @@ class Quotation {
   final String status;
   final String createdAt;
   final List<QuotationItem> items;
+  final List<Negotiation> negotiations;
 
   Quotation({
     required this.id,
@@ -78,6 +130,7 @@ class Quotation {
     required this.status,
     required this.createdAt,
     this.items = const [],
+    this.negotiations = const [],
   });
 
   factory Quotation.fromJson(Map<String, dynamic> json) {
@@ -85,6 +138,13 @@ class Quotation {
     if (json['items'] != null) {
       itemsList = (json['items'] as List)
           .map((item) => QuotationItem.fromJson(item))
+          .toList();
+    }
+
+    List<Negotiation> negotiationsList = [];
+    if (json['negotiations'] != null) {
+      negotiationsList = (json['negotiations'] as List)
+          .map((item) => Negotiation.fromJson(item))
           .toList();
     }
 
@@ -102,6 +162,7 @@ class Quotation {
       status: json['status'] ?? 'draft',
       createdAt: json['created_at'] ?? '',
       items: itemsList,
+      negotiations: negotiationsList,
     );
   }
 
@@ -135,5 +196,10 @@ class Quotation {
 
   bool canApprove() {
     return (status == 'sent' || status == 'revised') && !isExpired();
+  }
+
+  Negotiation? get latestNegotiation {
+    if (negotiations.isEmpty) return null;
+    return negotiations.first; // Backend is expected to sort by latest
   }
 }

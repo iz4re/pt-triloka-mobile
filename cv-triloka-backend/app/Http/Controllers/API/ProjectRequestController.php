@@ -16,7 +16,7 @@ class ProjectRequestController extends Controller
      */
     public function index(Request $request)
     {
-        $query = ProjectRequest::where('user_id', $request->user()->id)
+        $query = ProjectRequest::where('klien_id', $request->user()->id)
             ->with(['klien', 'documents']) 
             ->orderBy('created_at', 'desc');
 
@@ -56,7 +56,7 @@ class ProjectRequestController extends Controller
         }
 
         $projectRequest = ProjectRequest::create([
-            'user_id' => $request->user()->id,
+            'klien_id' => $request->user()->id,
             // 'klien_id' => $request->user()->id,  
             'title' => $request->title,
             'type' => $request->type,
@@ -93,7 +93,7 @@ class ProjectRequestController extends Controller
         }
 
         // Check if user owns this request
-        if ($projectRequest->user_id !== $request->user()->id) {
+        if ($projectRequest->klien_id !== $request->user()->id) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized access'
@@ -121,7 +121,7 @@ class ProjectRequestController extends Controller
         }
 
         // Check ownership
-        if ($projectRequest->user_id !== $request->user()->id) {
+        if ($projectRequest->klien_id !== $request->user()->id) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized access'
@@ -186,7 +186,7 @@ class ProjectRequestController extends Controller
         }
 
         // Check ownership
-        if ($projectRequest->user_id !== $request->user()->id) {
+        if ($projectRequest->klien_id !== $request->user()->id) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized access'
@@ -224,7 +224,7 @@ class ProjectRequestController extends Controller
         }
 
         // Check ownership
-        if ($projectRequest->user_id !== $request->user()->id) {
+        if ($projectRequest->klien_id !== $request->user()->id) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized access'
@@ -273,7 +273,7 @@ class ProjectRequestController extends Controller
      */
     public function deleteDocument(Request $request, $documentId)
     {
-        $document = RequestDocument::with('request')->find($documentId);
+        $document = RequestDocument::with('projectRequest')->find($documentId);
 
         if (!$document) {
             return response()->json([
@@ -283,7 +283,7 @@ class ProjectRequestController extends Controller
         }
 
         // Check ownership through project request
-        if ($document->request->user_id !== $request->user()->id) {
+        if ($document->projectRequest->klien_id !== $request->user()->id) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized access'
