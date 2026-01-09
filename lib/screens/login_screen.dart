@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import '../services/firebase_auth_service.dart';
 import '../services/api_service.dart';
@@ -34,21 +35,26 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
+      developer.log('Starting login process for: ${_emailController.text.trim()}', name: 'LoginScreen');
+      
       // Step 1: Login with Firebase
-      final credential = await _firebaseAuth.signInWithEmailPassword(
+      await _firebaseAuth.signInWithEmailPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
+      developer.log('Firebase login successful', name: 'LoginScreen');
 
       // Step 2: Get Firebase ID Token
       final idToken = await _firebaseAuth.getIdToken();
-
+      
       if (idToken == null) {
         throw Exception('Failed to get Firebase token');
       }
+      developer.log('Firebase ID Token obtained', name: 'LoginScreen');
 
       // Step 3: Verify with Laravel backend
       final response = await _apiService.firebaseLogin(idToken);
+      developer.log('Backend verification: ${response['success']}', name: 'LoginScreen');
 
       if (!mounted) return;
 
@@ -58,6 +64,14 @@ class _LoginScreenState extends State<LoginScreen> {
         await UserSession().setUserFromJson(userData);
 
         if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Login successful! Welcome back.'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 2),
+            ),
+          );
+          
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => const DashboardScreen()),
           );
@@ -66,6 +80,7 @@ class _LoginScreenState extends State<LoginScreen> {
         throw Exception(response['message'] ?? 'Login failed');
       }
     } catch (e) {
+      developer.log('Login error: $e', name: 'LoginScreen', error: e);
       if (mounted) {
         String errorMessage = 'Login failed: $e';
         

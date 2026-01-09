@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import '../services/firebase_auth_service.dart';
 import '../services/api_service.dart';
@@ -34,11 +35,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() => _isLoading = true);
 
     try {
+      developer.log('Starting registration process for: ${_emailController.text.trim()}', name: 'RegisterScreen');
+      
       // Step 1: Register with Firebase
-      final credential = await _firebaseAuth.registerWithEmailPassword(
+      await _firebaseAuth.registerWithEmailPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
+      developer.log('Firebase registration successful', name: 'RegisterScreen');
 
       // Step 2: Get Firebase ID Token
       final idToken = await _firebaseAuth.getIdToken();
@@ -46,21 +50,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (idToken == null) {
         throw Exception('Failed to get Firebase token');
       }
+      developer.log('Firebase ID Token obtained', name: 'RegisterScreen');
 
       // Step 3: Register with Laravel backend
       final response = await _apiService.firebaseRegister(
         idToken: idToken,
         name: _firstNameController.text.trim(),
       );
+      developer.log('Backend registration: ${response['success']}', name: 'RegisterScreen');
 
       if (!mounted) return;
 
       if (response['success'] == true) {
-        // Navigate to login screen
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const LoginScreen()),
-        );
-
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -69,10 +70,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
             duration: Duration(seconds: 3),
           ),
         );
+
+        // Navigate to login screen
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        );
       } else {
         throw Exception(response['message'] ?? 'Registration failed');
       }
     } catch (e) {
+      developer.log('Registration error: $e', name: 'RegisterScreen', error: e);
       if (mounted) {
         String errorMessage = 'Registration failed: $e';
         

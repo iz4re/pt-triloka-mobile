@@ -7,8 +7,8 @@ Sistem terpadu untuk manajemen keuangan dan operasional perusahaan dengan Larave
 **Timeline:** 3 minggu (Target: 21 Desember 2024)
 
 **Stack:**
-- **Backend:** Laravel 11 + MySQL + Sanctum Auth
-- **Frontend Mobile:** Flutter (untuk klien)
+- **Backend:** Laravel 11 + MySQL + Sanctum Auth + Firebase Admin SDK
+- **Frontend Mobile:** Flutter (Firebase Auth + Dio)
 - **Frontend Web:** Laravel/Vue (untuk admin) - *Coming soon*
 
 ---

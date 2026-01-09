@@ -47,7 +47,11 @@ class ApiService {
   }
 
   // Token management
-  Future<void> saveToken(String token) async {
+  Future<void> saveToken(String? token) async {
+    if (token == null || token.isEmpty) {
+      print('WRN: Attempted to save null or empty token');
+      return;
+    }
     await _storage.write(key: 'auth_token', value: token);
   }
 
@@ -86,7 +90,8 @@ class ApiService {
     }
   }
 
-  // Firebase Auth - Login
+  /// Sends Firebase ID Token to Laravel backend for login
+  /// Returns a Sanctum token on success
   Future<Map<String, dynamic>> firebaseLogin(String idToken) async {
     try {
       final response = await _dio.post(
@@ -94,14 +99,17 @@ class ApiService {
         data: {'idToken': idToken},
       );
 
+      print('DEBUG: firebaseLogin response data: ${response.data}');
+
       if (response.data['success'] == true) {
         // Save Laravel token
-        final token = response.data['data']['token'];
+        final token = response.data['data']?['token'];
         await saveToken(token);
       }
 
       return response.data;
     } on DioException catch (e) {
+      print('ERR: firebaseLogin DioError: ${e.message}, response: ${e.response?.data}');
       if (e.response != null) {
         return e.response!.data;
       }
@@ -109,7 +117,8 @@ class ApiService {
     }
   }
 
-  // Firebase Auth - Register
+  /// Sends Firebase ID Token and user details to Laravel backend for registration
+  /// Returns a Sanctum token and user data on success
   Future<Map<String, dynamic>> firebaseRegister({
     required String idToken,
     required String name,
