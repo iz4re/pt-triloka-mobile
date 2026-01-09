@@ -14,10 +14,11 @@ class AuthService {
       if (response['success'] == true) {
         // Parse user data from API response
         final userData = response['data']['user'];
+        final String? fullName = userData['name']?.toString();
         final user = User(
           id: userData['id'],
-          firstName: userData['name']?.split(' ').first ?? 'User',
-          lastName: userData['name']?.split(' ').skip(1).join(' '),
+          firstName: fullName?.split(' ').first ?? 'User',
+          lastName: fullName != null && fullName.split(' ').length > 1 ? fullName.split(' ').skip(1).join(' ') : '',
           email: userData['email'],
           passwordHash: '', // Not needed from API
           phone: userData['phone'],

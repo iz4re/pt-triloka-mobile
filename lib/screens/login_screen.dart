@@ -79,8 +79,15 @@ class _LoginScreenState extends State<LoginScreen> {
       } else {
         throw Exception(response['message'] ?? 'Login failed');
       }
-    } catch (e) {
-      developer.log('Login error: $e', name: 'LoginScreen', error: e);
+    } catch (e, stackTrace) {
+      developer.log(
+        'Login error: $e', 
+        name: 'LoginScreen', 
+        error: e, 
+        stackTrace: stackTrace
+      );
+      debugPrint('STACK TRACE: $stackTrace');
+      
       if (mounted) {
         String errorMessage = 'Login failed: $e';
         
