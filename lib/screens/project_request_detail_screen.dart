@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../models/project_request.dart';
 import '../services/api_service.dart';
 import 'project_request_form_screen.dart';
@@ -101,6 +102,29 @@ class _ProjectRequestDetailScreenState
   Future<void> _uploadDocument() async {
     try {
       debugPrint('DEBUG: Starting file picker...');
+
+      // Request storage permission first (Android 10+)
+      var status = await Permission.storage.status;
+      if (!status.isGranted) {
+        debugPrint('DEBUG: Requesting storage permission...');
+        status = await Permission.storage.request();
+
+        if (!status.isGranted) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  'Storage permission denied. Cannot upload files.',
+                ),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+          return;
+        }
+      }
+
+      debugPrint('DEBUG: Permission granted, opening file picker...');
 
       // Pick file
       FilePickerResult? result = await FilePicker.platform.pickFiles(
