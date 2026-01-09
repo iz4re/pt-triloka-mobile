@@ -10,6 +10,7 @@ use App\Http\Controllers\API\DashboardController;
 use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\ProjectRequestController;
 use App\Http\Controllers\API\QuotationController;
+use App\Http\Controllers\API\NegotiationController;
 
 // Public routes
 Route::post('/register', [AuthController::class, 'register']);
@@ -44,6 +45,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/quotations/{id}', [QuotationController::class, 'show']);
     Route::post('/quotations/{id}/approve', [QuotationController::class, 'approve']);
     Route::post('/quotations/{id}/reject', [QuotationController::class, 'reject']);
+
+    // Negotiations
+    Route::get('/negotiations', [NegotiationController::class, 'index']);
+    Route::post('/negotiations', [NegotiationController::class, 'store']);
+    Route::put('/negotiations/{id}/status', [NegotiationController::class, 'updateStatus']);
     
     // Debug endpoint (remove in production)
     Route::get('/debug/quotations', function(Request $request) {

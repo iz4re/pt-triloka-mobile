@@ -21,8 +21,6 @@ class Negotiation extends Model
     protected $casts = [
         'counter_amount' => 'decimal:2',
     ];
-
-    // Relationships
     public function quotation()
     {
         return $this->belongsTo(Quotation::class, 'quotation_id');
@@ -33,19 +31,28 @@ class Negotiation extends Model
         return $this->belongsTo(User::class, 'sender_id');
     }
 
-    // Helper methods
     public function isFromClient()
     {
-        return $this->sender_type === 'client';
+        return strtolower($this->sender_type) === 'klien';
     }
 
     public function isFromAdmin()
     {
-        return $this->sender_type === 'admin';
+        return strtolower($this->sender_type) === 'admin';
     }
 
     public function isPending()
     {
-        return $this->status === 'pending';
+        return strtolower($this->status) === 'pending';
+    }
+
+    public function isAccepted()
+    {
+        return strtolower($this->status) === 'accepted';
+    }
+
+    public function isRejected()
+    {
+        return strtolower($this->status) === 'rejected';
     }
 }
