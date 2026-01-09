@@ -44,6 +44,12 @@ class QuotationController extends Controller
     {
         $projectRequest = ProjectRequest::with(['klien', 'documents'])->findOrFail($requestId);
         
+        // Prevent creating quotation if project is locked
+        if ($projectRequest->isLocked()) {
+            return redirect()->route('admin.requests.show', $requestId)
+                ->with('error', 'Cannot create quotation - project is locked because invoice has been paid');
+        }
+        
         return view('admin.quotations.create', compact('projectRequest'));
     }
 

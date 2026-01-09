@@ -70,6 +70,12 @@ class RequestController extends Controller
         ]);
 
         $projectRequest = ProjectRequest::findOrFail($id);
+        
+        // Prevent editing if project is locked (invoice paid)
+        if ($projectRequest->isLocked()) {
+            return back()->with('error', 'Cannot update - project is locked because invoice has been paid');
+        }
+        
         $projectRequest->update($validated);
 
         return back()->with('success', 'Status updated successfully!');

@@ -18,7 +18,8 @@ class InvoiceController extends Controller
     {
         $user = $request->user();
         
-        $query = Invoice::with(['klien', 'creator', 'items', 'payments']);
+        // Only load essential relationships for mobile app
+        $query = Invoice::with(['klien', 'items', 'payments']);
 
         // Role-based filtering
         if ($user->isKlien()) {
@@ -142,7 +143,7 @@ class InvoiceController extends Controller
     {
         $user = $request->user();
         
-        $invoice = Invoice::with(['klien', 'creator', 'items', 'payments'])->find($id);
+        $invoice = Invoice::with(['klien', 'items', 'payments'])->find($id);
 
         if (!$invoice) {
             return response()->json([

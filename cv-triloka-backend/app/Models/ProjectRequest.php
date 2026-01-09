@@ -83,4 +83,16 @@ class ProjectRequest extends Model
     {
         return $this->status === 'negotiating';
     }
+
+    /**
+     * Check if project is locked (has paid invoice)
+     * Locked projects cannot be edited by admin
+     */
+    public function isLocked(): bool
+    {
+        // Check if any invoice from this project's quotations is paid
+        return Invoice::whereHas('quotation', function($query) {
+            $query->where('project_request_id', $this->id);
+        })->where('status', 'paid')->exists();
+    }
 }

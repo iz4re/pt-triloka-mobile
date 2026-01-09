@@ -48,10 +48,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('payments/{id}/verify', [App\Http\Controllers\Admin\PaymentController::class, 'verify'])->name('payments.verify');
             Route::post('payments/{id}/reject', [App\Http\Controllers\Admin\PaymentController::class, 'reject'])->name('payments.reject');
             
-            // Survey Invoices
-            Route::post('requests/{requestId}/survey-invoice', [App\Http\Controllers\Admin\SurveyInvoiceController::class, 'create'])->name('survey-invoice.create');
-            Route::get('requests/{requestId}/survey-fee-status', [App\Http\Controllers\Admin\SurveyInvoiceController::class, 'checkSurveyFeePaid'])->name('survey-invoice.check');
-            
             // Quotations
             Route::get('quotations', [App\Http\Controllers\Admin\QuotationController::class, 'index'])->name('quotations.index');
             Route::get('requests/{requestId}/quotations/create', [App\Http\Controllers\Admin\QuotationController::class, 'create'])->name('quotations.create');

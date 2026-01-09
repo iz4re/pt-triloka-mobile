@@ -75,8 +75,6 @@
                 </div>
             </dl>
         </div>
-
-        <!-- Documents -->
         <div class="bg-white rounded-lg shadow p-6">
             <h3 class="font-semibold text-gray-900 mb-4">
                 Uploaded Documents ({{ $request->documents->count() }})
@@ -89,7 +87,6 @@
                     @foreach($request->documents as $document)
                         <div class="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
                             <div class="flex items-center flex-1 min-w-0">
-                                <!-- File Icon -->
                                 <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded bg-purple-100">
                                     @if(in_array(strtolower(pathinfo($document->file_path, PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png']))
                                         <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -143,7 +140,6 @@
         </div>
     </div>
 
-    <!-- Sidebar -->
     <div class="space-y-6">
         <!-- Client Info -->
         <div class="bg-white rounded-lg shadow p-6">
@@ -180,12 +176,41 @@
                 </div>
             @endif
 
+            @if(session('error'))
+                <div class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm">
+                    {{ session('error') }}
+                </div>
+            @endif
+
+            @php
+                $isLocked = $request->isLocked();
+            @endphp
+
+            @if($isLocked)
+                <div class="mb-4 bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-yellow-700">
+                                <strong>Project Locked</strong> - Cannot edit because invoice has been paid
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             <form method="POST" action="{{ route('admin.requests.updateStatus', $request->id) }}">
                 @csrf
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                        <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+                        <select name="status" 
+                                {{ $isLocked ? 'disabled' : '' }}
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 {{ $isLocked ? 'bg-gray-100 cursor-not-allowed' : '' }}">
                             <option value="pending" {{ $request->status == 'pending' ? 'selected' : '' }}>Pending</option>
                             <option value="quoted" {{ $request->status == 'quoted' ? 'selected' : '' }}>Quoted</option>
                             <option value="negotiating" {{ $request->status == 'negotiating' ? 'selected' : '' }}>Negotiating</option>
@@ -194,7 +219,10 @@
                         </select>
                     </div>
                     
-                    <button type="submit" class="w-full px-4 py-2 text-white rounded-md hover:opacity-90" style="background-color: #6C5DD3;">
+                    <button type="submit" 
+                            {{ $isLocked ? 'disabled' : '' }}
+                            class="w-full px-4 py-2 text-white rounded-md hover:opacity-90 {{ $isLocked ? 'bg-gray-400 cursor-not-allowed' : '' }}" 
+                            style="{{ $isLocked ? '' : 'background-color: #6C5DD3;' }}">
                         Update Status
                     </button>
                 </div>
@@ -205,20 +233,21 @@
         <div class="bg-white rounded-lg shadow p-6">
             <h3 class="font-semibold text-gray-900 mb-4">Quick Actions</h3>
             <div class="space-y-2">
-                <form method="POST" action="{{ route('admin.survey-invoice.create', $request->id) }}">
-                    @csrf
-                    <button type="submit" class="w-full px-4 py-2 text-left text-sm font-medium text-white rounded-md hover:opacity-90" style="background-color: #10B981;">
-                        💰 Create Survey Invoice (Rp 500k)
-                    </button>
-                </form>
                 <button class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 rounded-md">
                     📧 Email Client
                 </button>
-                <a href="{{ route('admin.quotations.create', $request->id) }}" 
-                   class="block w-full px-4 py-2 text-left text-sm text-white rounded-md hover:opacity-90" 
-                   style="background-color: #6C5DD3;">
-                    📄 Create Quotation
-                </a>
+                
+                @if($isLocked)
+                    <div class="w-full px-4 py-2 text-left text-sm bg-gray-100 text-gray-400 rounded-md cursor-not-allowed">
+                         Create Quotation (Locked)
+                    </div>
+                @else
+                    <a href="{{ route('admin.quotations.create', $request->id) }}" 
+                       class="block w-full px-4 py-2 text-left text-sm text-white rounded-md hover:opacity-90" 
+                       style="background-color: #6C5DD3;">
+                        Create Quotation
+                    </a>
+                @endif
             </div>
         </div>
     </div>

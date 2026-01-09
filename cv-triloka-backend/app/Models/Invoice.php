@@ -59,6 +59,14 @@ class Invoice extends Model
     }
 
     /**
+     * Quotation that this invoice was created from
+     */
+    public function quotation()
+    {
+        return $this->belongsTo(Quotation::class, 'quotation_id');
+    }
+
+    /**
      * Invoice items
      */
     public function items()
@@ -147,57 +155,5 @@ class Invoice extends Model
         // Format: 8808 + 4-digit ID + 6-digit random
         // Example: 8808000123456 7 (displayed as 8808 0001 234567)
         return '8808' . str_pad($nextId, 4, '0', STR_PAD_LEFT) . $random;
-    }
-
-    /**
-     * Check if this is a survey invoice
-     */
-    public function isSurveyInvoice(): bool
-    {
-        return $this->invoice_type === 'survey';
-    }
-
-    /**
-     * Get the parent invoice (for project invoices that have survey fee)
-     */
-    public function parentInvoice()
-    {
-        return $this->belongsTo(Invoice::class, 'parent_invoice_id');
-    }
-
-    /**
-     * Get the child invoice (for survey invoices)
-     */
-    public function childInvoice()
-    {
-        return $this->hasOne(Invoice::class, 'parent_invoice_id');
-    }
-
-    /**
-     * Get standard survey fee amount
-     */
-    public static function getSurveyFeeAmount(): float
-    {
-        return 500000; // Rp 500k
-    }
-
-    /**
-     * Apply survey fee discount to this invoice
-     */
-    public function applySurveyFeeDiscount(Invoice $surveyInvoice): void
-    {
-        if ($this->isSurveyInvoice()) {
-            return; // Cannot apply to survey invoice itself
-        }
-
-        if ($surveyInvoice->status !== 'paid') {
-            return; // Survey must be paid first
-        }
-
-        $this->parent_invoice_id = $surveyInvoice->id;
-        $this->is_survey_fee_applied = true;
-        $this->discount = ($this->discount ?? 0) + self::getSurveyFeeAmount();
-        $this->total = $this->subtotal + $this->tax - $this->discount;
-        $this->save();
     }
 }
