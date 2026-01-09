@@ -1,8 +1,8 @@
-# CV Triloka - Financial & Operational System
+CV Triloka - Financial & Operational System
 
 Sistem terpadu untuk manajemen keuangan dan operasional perusahaan dengan Laravel backend dan Flutter frontend.
 
-## 🎯 Project Overview
+ Project Overview
 
 **Timeline:** 3 minggu (Target: 21 Desember 2024)
 
@@ -13,7 +13,7 @@ Sistem terpadu untuk manajemen keuangan dan operasional perusahaan dengan Larave
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 pt-triloka-mobile/
@@ -23,7 +23,7 @@ pt-triloka-mobile/
 
 ---
 
-## 🚀 Quick Start
+##  Quick Start
 
 **New team member?** Follow → [**Team Setup Guide**](.gemini/antigravity/brain/69ebc38b-c0ee-46ff-9230-836538ba3b08/team_setup_guide.md)
 
@@ -50,7 +50,7 @@ flutter run -d chrome
 
 ---
 
-## 📚 Documentation
+##  Documentation
 
 - **[Database Sync Guide](cv-triloka-backend/DATABASE_SYNC.md)** - How to keep database in sync with team
 - [Team Setup Guide](.gemini/antigravity/brain/69ebc38b-c0ee-46ff-9230-836538ba3b08/team_setup_guide.md) - Complete setup for new members
@@ -58,20 +58,20 @@ flutter run -d chrome
 ---
 
 
-## 🔥 Features
+##  Features
 
-### ✅ Implemented
+### Implemented
 - User authentication (Login/Register)
 - API integration (Flutter ↔ Laravel)
 - CORS configuration
 - Dashboard (basic)
 
-### 🚧 In Progress
+###  In Progress
 - Profile management
 - Notification system
 - Dashboard with real data
 
-### 📋 Planned
+### Planned
 - Project request submission
 - Quotation view & approval
 - Payment with proof upload
@@ -80,9 +80,9 @@ flutter run -d chrome
 
 ---
 
-## 🛠️ Development
+## Development
 
-**Start servers:**
+Start servers:
 
 ```bash
 # Terminal 1: Laravel backend
@@ -107,17 +107,11 @@ flutter pub get            # Install packages
 
 ---
 
-## 👥 Team
+## Team
+Ahmad Naufal Alghiffari,
+Yudha Harwanto,
+abizar,
+Hafidz
 
-- **Project Lead:** [Naufal]
-- **Timeline:** 21 hari (sampai 21 Des 2024)
-
----
-
-## 📞 Support
-
-Got issues? Check [Team Setup Guide](.gemini/antigravity/brain/69ebc38b-c0ee-46ff-9230-836538ba3b08/team_setup_guide.md) troubleshooting section.
 
 ---
-
-**Last Updated:** 2 Desember 2024
