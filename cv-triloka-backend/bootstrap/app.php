@@ -12,7 +12,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->append(\App\Http\Middleware\Cors::class);
+        // Apply CORS only to API routes
+        $middleware->api(prepend: [
+            \App\Http\Middleware\Cors::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
