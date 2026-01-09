@@ -81,15 +81,17 @@ class User {
   // Create User from Map
   factory User.fromMap(Map<String, dynamic> map) {
     return User(
-      id: map['id'],
-      firstName: map['firstName'] ?? map['name'] ?? '',
-      lastName: map['lastName'],
-      email: map['email'] ?? '',
-      passwordHash: map['passwordHash'] ?? map['password'],
-      phone: map['phone'],
-      profilePhoto: map['profilePhoto'],
-      gender: map['gender'],
-      dateOfBirth: map['dateOfBirth'],
+      id: map['id'] is int
+          ? map['id']
+          : (map['id'] != null ? int.tryParse(map['id'].toString()) : null),
+      firstName: (map['firstName'] ?? map['name'] ?? '').toString(),
+      lastName: map['lastName']?.toString(),
+      email: (map['email'] ?? '').toString(),
+      passwordHash: (map['passwordHash'] ?? map['password'])?.toString(),
+      phone: map['phone']?.toString(),
+      profilePhoto: map['profilePhoto']?.toString(),
+      gender: map['gender']?.toString(),
+      dateOfBirth: map['dateOfBirth']?.toString(),
     );
   }
 }
