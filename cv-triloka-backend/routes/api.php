@@ -16,6 +16,10 @@ use App\Http\Controllers\API\NegotiationController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+// Firebase authentication
+Route::post('/firebase/register', [AuthController::class, 'firebaseRegister']);
+Route::post('/firebase/login', [AuthController::class, 'firebaseLogin']);
+
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
     

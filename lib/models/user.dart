@@ -3,7 +3,7 @@ class User {
   final String firstName;
   final String? lastName;
   final String email;
-  final String passwordHash;
+  final String? passwordHash;
   final String? phone;
   final String? profilePhoto; // Base64 encoded image
   final String? gender;
@@ -14,7 +14,7 @@ class User {
     required this.firstName,
     this.lastName,
     required this.email,
-    required this.passwordHash,
+    this.passwordHash,
     this.phone,
     this.profilePhoto,
     this.gender,
@@ -82,10 +82,10 @@ class User {
   factory User.fromMap(Map<String, dynamic> map) {
     return User(
       id: map['id'],
-      firstName: map['firstName'],
+      firstName: map['firstName'] ?? map['name'] ?? '',
       lastName: map['lastName'],
-      email: map['email'],
-      passwordHash: map['passwordHash'],
+      email: map['email'] ?? '',
+      passwordHash: map['passwordHash'] ?? map['password'],
       phone: map['phone'],
       profilePhoto: map['profilePhoto'],
       gender: map['gender'],

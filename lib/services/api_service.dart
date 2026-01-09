@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'api_config.dart';
 import 'dart:io';
 
@@ -63,7 +64,7 @@ class ApiService {
     return token != null;
   }
 
-  // Auth APIs
+  // Auth APIs (Legacy - Email/Password)
   Future<Map<String, dynamic>> login(String email, String password) async {
     try {
       final requestData = {'email': email, 'password': password};
@@ -72,6 +73,64 @@ class ApiService {
 
       if (response.data['success'] == true) {
         // Save token
+        final token = response.data['data']['token'];
+        await saveToken(token);
+      }
+
+      return response.data;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        return e.response!.data;
+      }
+      rethrow;
+    }
+  }
+
+  // Firebase Auth - Login
+  Future<Map<String, dynamic>> firebaseLogin(String idToken) async {
+    try {
+      final response = await _dio.post(
+        '/firebase/login',
+        data: {'idToken': idToken},
+      );
+
+      if (response.data['success'] == true) {
+        // Save Laravel token
+        final token = response.data['data']['token'];
+        await saveToken(token);
+      }
+
+      return response.data;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        return e.response!.data;
+      }
+      rethrow;
+    }
+  }
+
+  // Firebase Auth - Register
+  Future<Map<String, dynamic>> firebaseRegister({
+    required String idToken,
+    required String name,
+    String? phone,
+    String? address,
+    String? companyName,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '/firebase/register',
+        data: {
+          'idToken': idToken,
+          'name': name,
+          'phone': phone,
+          'address': address,
+          'company_name': companyName,
+        },
+      );
+
+      if (response.data['success'] == true) {
+        // Save Laravel token
         final token = response.data['data']['token'];
         await saveToken(token);
       }

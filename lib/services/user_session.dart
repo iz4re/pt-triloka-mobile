@@ -50,4 +50,10 @@ class UserSession {
       }
     }
   }
+
+  // Set user from JSON data (for API responses)
+  Future<void> setUserFromJson(Map<String, dynamic> json) async {
+    final user = User.fromMap(json);
+    await setUser(user);
+  }
 }
