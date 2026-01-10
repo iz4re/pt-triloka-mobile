@@ -188,6 +188,10 @@ class _QuotationDetailScreenState extends State<QuotationDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildHeaderCard(),
+                  if (_quotation!.negotiations.isNotEmpty) ...[
+                    const SizedBox(height: 16),
+                    _buildNegotiationStatus(),
+                  ],
                   const SizedBox(height: 16),
                   _buildItemsCard(),
                   const SizedBox(height: 16),
@@ -274,6 +278,97 @@ class _QuotationDetailScreenState extends State<QuotationDetailScreen> {
                 ),
               ],
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNegotiationStatus() {
+    final latest = _quotation!.latestNegotiation;
+    if (latest == null) return const SizedBox.shrink();
+
+    Color bgColor;
+    Color textColor;
+    IconData icon;
+    String statusText;
+
+    switch (latest.status.toLowerCase()) {
+      case 'accepted':
+        bgColor = Colors.green.withValues(alpha: 0.1);
+        textColor = Colors.green[800]!;
+        icon = Icons.check_circle;
+        statusText = 'Negosiasi Disetujui';
+        break;
+      case 'rejected':
+        bgColor = Colors.red.withValues(alpha: 0.1);
+        textColor = Colors.red[800]!;
+        icon = Icons.cancel;
+        statusText = 'Negosiasi Ditolak';
+        break;
+      default:
+        bgColor = Colors.blue.withValues(alpha: 0.1);
+        textColor = Colors.blue[800]!;
+        icon = Icons.info;
+        statusText = 'Negosiasi Menunggu';
+    }
+
+    return Card(
+      color: bgColor,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: textColor.withValues(alpha: 0.2)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, color: textColor, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  statusText,
+                  style: TextStyle(
+                    color: textColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Pesan Anda: ${latest.message}',
+              style: TextStyle(color: textColor.withValues(alpha: 0.8), fontSize: 13),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Penawaran: ${NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0).format(latest.counterAmount)}',
+              style: TextStyle(
+                color: textColor,
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+              ),
+            ),
+            if (latest.adminNotes != null && latest.adminNotes!.isNotEmpty) ...[
+              const Divider(height: 16),
+              Text(
+                'Catatan Admin:',
+                style: TextStyle(
+                  color: textColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                latest.adminNotes!,
+                style: TextStyle(color: textColor, fontSize: 13),
+              ),
+            ],
           ],
         ),
       ),

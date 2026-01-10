@@ -28,6 +28,8 @@ class User extends Authenticatable
         'address',
         'company_name',
         'is_active',
+        'firebase_uid',
+        'pending_projects',
     ];
 
     /**

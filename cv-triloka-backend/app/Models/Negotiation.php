@@ -16,6 +16,7 @@ class Negotiation extends Model
         'message',
         'counter_amount',
         'status',
+        'admin_notes',
     ];
 
     protected $casts = [

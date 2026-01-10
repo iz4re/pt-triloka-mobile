@@ -1,5 +1,7 @@
+import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
-import '../services/auth_service.dart';
+import '../services/firebase_auth_service.dart';
+import '../services/api_service.dart';
 import '../services/user_session.dart';
 import 'register_screen.dart';
 import 'dashboard_screen.dart';
@@ -15,7 +17,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _authService = AuthService();
+  final _firebaseAuth = FirebaseAuthService();
+  final _apiService = ApiService();
   bool _isPasswordVisible = false;
   bool _isLoading = false;
 
@@ -31,34 +34,145 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() => _isLoading = true);
 
-    final result = await _authService.login(
-      _emailController.text.trim(),
-      _passwordController.text,
-    );
+    try {
+      developer.log('Starting login process for: ${_emailController.text.trim()}', name: 'LoginScreen');
+      
+      // Step 1: Login with Firebase
+      await _firebaseAuth.signInWithEmailPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
+      developer.log('Firebase login successful', name: 'LoginScreen');
 
-    setState(() => _isLoading = false);
-
-    if (!mounted) return;
-
-    if (result.success) {
-      // Save user to session
-      if (result.user != null) {
-        await UserSession().setUser(result.user!);
+      // Step 2: Get Firebase ID Token
+      final idToken = await _firebaseAuth.getIdToken();
+      
+      if (idToken == null) {
+        throw Exception('Failed to get Firebase token');
       }
+      developer.log('Firebase ID Token obtained', name: 'LoginScreen');
 
+      // Step 3: Verify with Laravel backend
+      final response = await _apiService.firebaseLogin(idToken);
+      developer.log('Backend verification: ${response['success']}', name: 'LoginScreen');
+
+      if (!mounted) return;
+
+      if (response['success'] == true) {
+        // Save user to session
+        final userData = response['data']['user'];
+        await UserSession().setUserFromJson(userData);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Login successful! Welcome back.'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 2),
+            ),
+          );
+          
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const DashboardScreen()),
+          );
+        }
+      } else {
+        throw Exception(response['message'] ?? 'Login failed');
+      }
+    } catch (e, stackTrace) {
+      developer.log(
+        'Login error: $e', 
+        name: 'LoginScreen', 
+        error: e, 
+        stackTrace: stackTrace
+      );
+      debugPrint('STACK TRACE: $stackTrace');
+      
       if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const DashboardScreen()),
+        String errorMessage = 'Login failed: $e';
+        
+        // Handle specific Firebase errors
+        if (e.toString().contains('user-not-found')) {
+          errorMessage = 'No account found with this email. Please register first.';
+        } else if (e.toString().contains('wrong-password')) {
+          errorMessage = 'Incorrect password. Please try again.';
+        } else if (e.toString().contains('invalid-email')) {
+          errorMessage = 'Invalid email format.';
+        } else if (e.toString().contains('too-many-requests')) {
+          errorMessage = 'Too many attempts. Please try again later.';
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: Colors.red,
+          ),
         );
       }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Email atau password salah. Silakan coba lagi!'),
-          backgroundColor: Colors.red,
-        ),
-      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
+  }
+
+  void _showForgotPasswordDialog() {
+    final emailController = TextEditingController(text: _emailController.text);
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Forgot Password?'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Enter your email and we will send you a reset link.'),
+            const SizedBox(height: 16),
+            TextField(
+              controller: emailController,
+              decoration: const InputDecoration(
+                labelText: 'Email',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final email = emailController.text.trim();
+              if (email.isEmpty) return;
+              
+              Navigator.pop(context);
+              try {
+                await _firebaseAuth.sendPasswordResetEmail(email);
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Reset link sent to your email!'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Failed to send reset link: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            child: const Text('Send Link'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -209,12 +323,15 @@ class _LoginScreenState extends State<LoginScreen> {
                         color: Colors.black,
                       ),
                     ),
-                    Text(
-                      'Forgot?',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: const Color(0xFF6C5DD3),
-                        fontWeight: FontWeight.w500,
+                    GestureDetector(
+                      onTap: _showForgotPasswordDialog,
+                      child: const Text(
+                        'Forgot?',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF6C5DD3),
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                   ],

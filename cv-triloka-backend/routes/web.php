@@ -6,15 +6,13 @@ use App\Http\Controllers\Admin\DashboardController;
 
 // Public routes
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('admin.login');
 });
 
 // Admin Panel Routes
 Route::prefix('admin')->name('admin.')->group(function () {
-    // Guest routes (login page only)
-    Route::middleware('guest')->group(function () {
-        Route::get('login', [AdminAuthController::class, 'showLogin'])->name('login');
-    });
+    // Login routes
+    Route::get('login', [AdminAuthController::class, 'showLogin'])->name('login');
     
     // Login POST (no middleware to allow auth attempt)
     Route::post('login', [AdminAuthController::class, 'login'])->name('login.post');

@@ -117,25 +117,36 @@
 
                     <!-- Actions -->
                     @if($negotiation->status === 'pending')
-                        <div class="flex gap-3">
-                            <form method="POST" action="{{ route('admin.negotiations.accept', $negotiation->id) }}" class="flex-1">
-                                @csrf
+                        <form method="POST" action="" id="negotiationForm-{{ $negotiation->id }}">
+                            @csrf
+                            <div class="mb-4">
+                                <label class="text-xs text-gray-600 block mb-2">Admin Notes (optional):</label>
+                                <textarea name="admin_notes" rows="2" 
+                                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm"
+                                          placeholder="Add a reason for acceptance or rejection..."></textarea>
+                            </div>
+                            <div class="flex gap-3">
                                 <button type="submit" 
-                                        class="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold"
+                                        formaction="{{ route('admin.negotiations.accept', $negotiation->id) }}"
+                                        class="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold text-center"
                                         onclick="return confirm('Accept this negotiation?\n\nQuotation will be updated to Rp {{ number_format($negotiation->counter_amount, 0, ',', '.') }}')">
-                                     Accept & Update Quotation
+                                     Accept & Update
                                 </button>
-                            </form>
-                            <form method="POST" action="{{ route('admin.negotiations.reject', $negotiation->id) }}" class="flex-1">
-                                @csrf
                                 <button type="submit" 
-                                        class="w-full px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold"
+                                        formaction="{{ route('admin.negotiations.reject', $negotiation->id) }}"
+                                        class="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold text-center"
                                         onclick="return confirm('Reject this negotiation?')">
                                      Reject
                                 </button>
-                            </form>
-                        </div>
+                            </div>
+                        </form>
                     @else
+                        @if($negotiation->admin_notes)
+                            <div class="bg-gray-50 border-l-4 border-gray-300 p-3 mb-4">
+                                <p class="text-xs text-gray-500 uppercase font-bold mb-1">Admin Notes:</p>
+                                <p class="text-sm text-gray-700">{{ $negotiation->admin_notes }}</p>
+                            </div>
+                        @endif
                         <div class="text-center py-2 text-gray-500 font-medium">
                             Already {{ ucfirst($negotiation->status) }}
                         </div>

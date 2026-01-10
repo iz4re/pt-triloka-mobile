@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'api_config.dart';
 import 'dart:io';
 
@@ -46,7 +47,11 @@ class ApiService {
   }
 
   // Token management
-  Future<void> saveToken(String token) async {
+  Future<void> saveToken(String? token) async {
+    if (token == null || token.isEmpty) {
+      print('WRN: Attempted to save null or empty token');
+      return;
+    }
     await _storage.write(key: 'auth_token', value: token);
   }
 
@@ -63,7 +68,7 @@ class ApiService {
     return token != null;
   }
 
-  // Auth APIs
+  // Auth APIs (Legacy - Email/Password)
   Future<Map<String, dynamic>> login(String email, String password) async {
     try {
       final requestData = {'email': email, 'password': password};
@@ -72,6 +77,69 @@ class ApiService {
 
       if (response.data['success'] == true) {
         // Save token
+        final token = response.data['data']['token'];
+        await saveToken(token);
+      }
+
+      return response.data;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        return e.response!.data;
+      }
+      rethrow;
+    }
+  }
+
+  /// Sends Firebase ID Token to Laravel backend for login
+  /// Returns a Sanctum token on success
+  Future<Map<String, dynamic>> firebaseLogin(String idToken) async {
+    try {
+      final response = await _dio.post(
+        '/firebase/login',
+        data: {'idToken': idToken},
+      );
+
+      print('DEBUG: firebaseLogin response data: ${response.data}');
+
+      if (response.data['success'] == true) {
+        // Save Laravel token
+        final token = response.data['data']?['token'];
+        await saveToken(token);
+      }
+
+      return response.data;
+    } on DioException catch (e) {
+      print('ERR: firebaseLogin DioError: ${e.message}, response: ${e.response?.data}');
+      if (e.response != null) {
+        return e.response!.data;
+      }
+      rethrow;
+    }
+  }
+
+  /// Sends Firebase ID Token and user details to Laravel backend for registration
+  /// Returns a Sanctum token and user data on success
+  Future<Map<String, dynamic>> firebaseRegister({
+    required String idToken,
+    required String name,
+    String? phone,
+    String? address,
+    String? companyName,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '/firebase/register',
+        data: {
+          'idToken': idToken,
+          'name': name,
+          'phone': phone,
+          'address': address,
+          'company_name': companyName,
+        },
+      );
+
+      if (response.data['success'] == true) {
+        // Save Laravel token
         final token = response.data['data']['token'];
         await saveToken(token);
       }

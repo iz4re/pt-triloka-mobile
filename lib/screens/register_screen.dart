@@ -1,5 +1,7 @@
+import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
-import '../services/auth_service.dart';
+import '../services/firebase_auth_service.dart';
+import '../services/api_service.dart';
 import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -14,7 +16,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _firstNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _authService = AuthService();
+  final _firebaseAuth = FirebaseAuthService();
+  final _apiService = ApiService();
   bool _isPasswordVisible = false;
   bool _isLoading = false;
 
@@ -31,38 +34,72 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     setState(() => _isLoading = true);
 
-    final result = await _authService.register(
-      name: _firstNameController.text.trim(),
-      email: _emailController.text.trim(),
-      password: _passwordController.text,
-      passwordConfirmation: _passwordController.text,
-    );
-
-    setState(() => _isLoading = false);
-
-    if (!mounted) return;
-
-    if (result.success) {
-      // Go back to login screen
-      // Navigator.of(context).pop();
-
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
+    try {
+      developer.log('Starting registration process for: ${_emailController.text.trim()}', name: 'RegisterScreen');
+      
+      // Step 1: Register with Firebase
+      await _firebaseAuth.registerWithEmailPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
       );
+      developer.log('Firebase registration successful', name: 'RegisterScreen');
 
-      // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Registration successful! Please login.'),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 3),
-        ),
+      // Step 2: Get Firebase ID Token
+      final idToken = await _firebaseAuth.getIdToken();
+
+      if (idToken == null) {
+        throw Exception('Failed to get Firebase token');
+      }
+      developer.log('Firebase ID Token obtained', name: 'RegisterScreen');
+
+      // Step 3: Register with Laravel backend
+      final response = await _apiService.firebaseRegister(
+        idToken: idToken,
+        name: _firstNameController.text.trim(),
       );
-    } else {
-      // Show error message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result.message), backgroundColor: Colors.red),
-      );
+      developer.log('Backend registration: ${response['success']}', name: 'RegisterScreen');
+
+      if (!mounted) return;
+
+      if (response['success'] == true) {
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Registration successful! Please login.'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 3),
+          ),
+        );
+
+        // Navigate to login screen
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        );
+      } else {
+        throw Exception(response['message'] ?? 'Registration failed');
+      }
+    } catch (e) {
+      developer.log('Registration error: $e', name: 'RegisterScreen', error: e);
+      if (mounted) {
+        String errorMessage = 'Registration failed: $e';
+        
+        // Handle specific Firebase errors
+        if (e.toString().contains('email-already-in-use')) {
+          errorMessage = 'This email is already registered. Please login instead.';
+        } else if (e.toString().contains('invalid-email')) {
+          errorMessage = 'Invalid email format.';
+        } else if (e.toString().contains('weak-password')) {
+          errorMessage = 'Password is too weak. Use at least 6 characters.';
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 

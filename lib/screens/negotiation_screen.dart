@@ -12,9 +12,11 @@ class Negotiation {
 
   factory Negotiation.fromJson(Map<String, dynamic> json) {
     return Negotiation(
-      message: json['message'] as String,
-      sender: json['sender'] as String,
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      message: json['message']?.toString() ?? '',
+      sender: json['sender']?.toString() ?? '',
+      createdAt: json['createdAt'] != null 
+          ? DateTime.tryParse(json['createdAt'].toString()) ?? DateTime.now()
+          : DateTime.now(),
     );
   }
 }

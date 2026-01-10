@@ -562,7 +562,7 @@ class _ProjectRequestFormScreenState extends State<ProjectRequestFormScreen> {
     final isLast = index == _selectedDocuments.length - 1;
 
     IconData icon;
-    final fileName = doc['fileName'] as String;
+    final fileName = doc['fileName']?.toString() ?? 'document.pdf';
     if (fileName.endsWith('.pdf')) {
       icon = Icons.picture_as_pdf;
     } else if (fileName.endsWith('.jpg') ||

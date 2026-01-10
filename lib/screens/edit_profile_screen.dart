@@ -180,8 +180,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         final userData = response['data'];
         final updatedUser = User(
           id: userData['id'],
-          firstName: userData['name']?.split(' ').first ?? 'User',
-          lastName: userData['name']?.split(' ').skip(1).join(' '),
+          firstName: userData['name']?.toString().split(' ').first ?? 'User',
+          lastName: (userData['name']?.toString().split(' ').length ?? 0) > 1 
+              ? userData['name']?.toString().split(' ').skip(1).join(' ') 
+              : '',
           email: userData['email'],
           passwordHash: '',
           phone: userData['phone'],

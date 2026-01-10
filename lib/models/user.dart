@@ -1,9 +1,9 @@
 class User {
   final int? id;
-  final String firstName;
+  final String? firstName;
   final String? lastName;
-  final String email;
-  final String passwordHash;
+  final String? email;
+  final String? passwordHash;
   final String? phone;
   final String? profilePhoto; // Base64 encoded image
   final String? gender;
@@ -11,10 +11,10 @@ class User {
 
   User({
     this.id,
-    required this.firstName,
+    this.firstName,
     this.lastName,
-    required this.email,
-    required this.passwordHash,
+    this.email,
+    this.passwordHash,
     this.phone,
     this.profilePhoto,
     this.gender,
@@ -23,15 +23,24 @@ class User {
 
   // Get full name
   String getFullName() {
-    if (lastName != null && lastName!.isNotEmpty) {
-      return '$firstName $lastName';
+    final first = firstName ?? '';
+    final last = lastName ?? '';
+    if (last.isNotEmpty) {
+      if (first.isEmpty) return last;
+      return '$first $last';
     }
-    return firstName;
+    return first;
   }
 
   // Get initials for avatar
   String getInitials() {
-    String initials = firstName[0].toUpperCase();
+    if (firstName == null || firstName!.isEmpty) {
+      if (lastName != null && lastName!.isNotEmpty) {
+        return lastName![0].toUpperCase();
+      }
+      return 'U';
+    }
+    String initials = firstName![0].toUpperCase();
     if (lastName != null && lastName!.isNotEmpty) {
       initials += lastName![0].toUpperCase();
     }
@@ -79,17 +88,22 @@ class User {
   }
 
   // Create User from Map
-  factory User.fromMap(Map<String, dynamic> map) {
+  factory User.fromMap(Map<String, dynamic>? map) {
+    if (map == null) {
+      return User();
+    }
     return User(
-      id: map['id'],
-      firstName: map['firstName'],
-      lastName: map['lastName'],
-      email: map['email'],
-      passwordHash: map['passwordHash'],
-      phone: map['phone'],
-      profilePhoto: map['profilePhoto'],
-      gender: map['gender'],
-      dateOfBirth: map['dateOfBirth'],
+      id: map['id'] is int
+          ? map['id']
+          : (map['id'] != null ? int.tryParse(map['id'].toString()) : null),
+      firstName: (map['firstName'] ?? map['name'])?.toString(),
+      lastName: map['lastName']?.toString(),
+      email: map['email']?.toString(),
+      passwordHash: (map['passwordHash'] ?? map['password'])?.toString(),
+      phone: map['phone']?.toString(),
+      profilePhoto: map['profilePhoto']?.toString(),
+      gender: map['gender']?.toString(),
+      dateOfBirth: map['dateOfBirth']?.toString(),
     );
   }
 }
